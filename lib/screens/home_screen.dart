@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idea_soop/main.dart';
 import 'package:intl/intl.dart';
 
 //  날짜 서수 접미사 함수
@@ -57,12 +58,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             width: double.infinity,
             height: 150,
+            color: AppColors.background,
             child: Container(
               margin: EdgeInsets.fromLTRB(25, 70, 25, 10),
               child: Row(
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width - 90,
+                    width: screenWidth - 90,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -77,7 +79,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(height: 5),
                         Text(
                           formattedDate,
-                          style: TextStyle(fontSize: 15, fontFamily: 'Poppins'),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Poppins',
+                          ),
                         ),
                       ],
                     ),
@@ -109,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: const EdgeInsets.all(15),
                     padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(),
                       boxShadow: [
@@ -137,7 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 15),
 
-                        if (_savedAnswer == null || _savedAnswer == "") ...[      //   1. 저장된 답변이 없을 때
+                        if (_savedAnswer == null || _savedAnswer == "") ...[
+                          //   1. 저장된 답변이 없을 때
                           if (!_isAnswering) ...[
                             //  1-1. 작성중이 아니면 답변작성 버튼 표시
                             ElevatedButton(
@@ -148,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 });
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).primaryColor,
+                                backgroundColor: AppColors.primary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   side: BorderSide(color: Colors.black),
@@ -161,8 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
-                          ] 
-                          else ...[
+                          ] else ...[
                             // 1-2. 답변 작성 중
                             TextField(
                               controller: _answerController,
@@ -170,11 +175,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
+                                  
                                 ),
                                 hintText: "여기에 당신의 생각을 자유롭게 적어보세요.",
                                 hintStyle: TextStyle(
                                   fontSize: 13,
-                                  color: Colors.grey[700],
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                             ),
@@ -191,10 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(
-                                          context,
-                                        ).scaffoldBackgroundColor,
+                                    backgroundColor: AppColors.background,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -219,8 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(context).primaryColor,
+                                    backgroundColor: AppColors.primary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -237,10 +239,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                           ],
-                        ] 
-                        else ...[     //  저장된 답변이 있을 때
+                        ] else ...[
+                          //  저장된 답변이 있을 때
                           if (!_isAnswering) ...[
                             //  작성중이 아닐 때 기존 답변, 답변 수정 버튼 표시
+                            Divider(
+                              color: Colors.grey, // 선 색상
+                              thickness: 1, // 선 두께
+                              indent: 0, // 왼쪽 여백
+                              endIndent: 0, // 오른쪽 여백
+                            ),
                             Text(
                               _savedAnswer!,
                               style: TextStyle(
@@ -248,31 +256,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.black87,
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 20),
 
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _isAnswering = true;
-                                  _answerController.text = _savedAnswer!;
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  side: BorderSide(color: Colors.black),
+                            Row(
+                              children: [
+                                Spacer(),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _isAnswering = true;
+                                      _answerController.text = _savedAnswer!;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      side: BorderSide(color: Colors.black),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "수정",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              child: Center(
-                                child: const Text(
-                                  "답변 수정",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
+                              ],
                             ),
-                          ] 
-                          else ...[
+                          ] else ...[
                             TextField(
                               controller: _answerController,
                               maxLines: 4,
@@ -295,10 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(
-                                          context,
-                                        ).scaffoldBackgroundColor,
+                                    backgroundColor: AppColors.background,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -322,8 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Theme.of(context).primaryColor,
+                                    backgroundColor: AppColors.primary,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -370,9 +379,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
           ],
-          backgroundColor: Color(0xfffff6e4),
+          backgroundColor: AppColors.background,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Color(0xff369882),
+          selectedItemColor: AppColors.primary,
           unselectedItemColor: Colors.grey[500],
           showSelectedLabels: false,
           showUnselectedLabels: false,
