@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/main.dart';
 import 'package:intl/intl.dart';
 
@@ -27,8 +28,9 @@ String formatDateWithSuffix(DateTime date) {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
+  @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
@@ -38,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _savedAnswer;
 
+  @override
   void dispose() {
     _answerController.dispose();
     super.dispose();
@@ -58,12 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             width: double.infinity,
             height: 150,
-            color: AppColors.background,
+            color: backgroundColor,
             child: Container(
               margin: EdgeInsets.fromLTRB(25, 70, 25, 10),
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     width: screenWidth - 90,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: const EdgeInsets.all(15),
                     padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
                     decoration: BoxDecoration(
-                      color: AppColors.background,
+                      color: backgroundColor,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(),
                       boxShadow: [
@@ -154,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 });
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
+                                backgroundColor: pointColorStrong,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   side: BorderSide(color: Colors.black),
@@ -180,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 hintText: "여기에 당신의 생각을 자유롭게 적어보세요.",
                                 hintStyle: TextStyle(
                                   fontSize: 13,
-                                  color: AppColors.textSecondary,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
@@ -197,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.background,
+                                    backgroundColor: backgroundColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -222,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
+                                    backgroundColor: pointColorStrong,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -269,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
+                                    backgroundColor: pointColorStrong,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -308,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.background,
+                                    backgroundColor: backgroundColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -332,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     });
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
+                                    backgroundColor: pointColorStrong,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                       side: BorderSide(color: Colors.black),
@@ -379,9 +382,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
           ],
-          backgroundColor: AppColors.background,
+          backgroundColor: backgroundColor,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: AppColors.primary,
+          selectedItemColor: pointColorStrong,
           unselectedItemColor: Colors.grey[500],
           showSelectedLabels: false,
           showUnselectedLabels: false,
