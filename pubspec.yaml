@@ -62,22 +62,14 @@ flutter:
   fonts:
     - family: NanumSquareRound
       fonts:
-        - asset: assets/fonts/NanumSquareRoundL.ttf
-          weight: 300
         - asset: assets/fonts/NanumSquareRoundR.ttf
-        - asset: assets/fonts/NanumSquareRoundB.ttf
-          weight: 700
 
     - family: Poppins
       fonts:
-        - asset: assets/fonts/Poppins-Thin.ttf
-          weight: 300
-        - asset: assets/fonts/Poppins-Medium.ttf
-        - asset: assets/fonts/Poppins-Bold.ttf
-          weight: 700
+        - asset: assets/fonts/Poppins-Regular.ttf
 
   assets:
-    - assets/images/home_screen_background.png
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
