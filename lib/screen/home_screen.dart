@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
-import 'package:idea_soop/main.dart';
 import 'package:intl/intl.dart';
 
 //  날짜 서수 접미사 함수
