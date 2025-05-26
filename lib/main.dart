@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:idea_soop/screen/CharacterSelectScreen.dart';
-import 'package:idea_soop/screen/TopicSelectScreen.dart';
 import 'package:idea_soop/screen/LoginScreen.dart';
 
 void main() {
