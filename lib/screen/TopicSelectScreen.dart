@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
+import 'package:idea_soop/screen/home_screen.dart';
 
 class TopicSelectScreen extends StatelessWidget {
   const TopicSelectScreen({super.key});
@@ -133,7 +134,10 @@ class BottomButtons extends StatelessWidget {
             height: 54,
             child: ElevatedButton(
               onPressed: () {
-                // 다음 화면 이동
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: pointColorStrong,
