@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/screen/LoginScreen.dart';
-import 'package:idea_soop/screen/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
