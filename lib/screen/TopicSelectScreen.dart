@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
-import 'package:idea_soop/screen/NameSelectScreen.dart';
-
+import 'package:idea_soop/screen/home_screen.dart';
 
 class TopicSelectScreen extends StatelessWidget {
   const TopicSelectScreen({super.key});
@@ -137,10 +136,7 @@ class BottomButtons extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => NicknameSelectScreen(),
-                  ),
-
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -159,10 +155,7 @@ class BottomButtons extends StatelessWidget {
         const SizedBox(height: 12),
         TextButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => NicknameSelectScreen()),
-            );
+            // 건너뛰기 동작
           },
           child: const Text(
             '건너뛰기',

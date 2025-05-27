@@ -145,10 +145,7 @@ class SkipButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const TopicSelectScreen()),
-        );
+        // 건너뛰기 동작
       },
       child: const Text(
         '건너뛰기',
