@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/NameSelectScreen.dart';
 
+
 class TopicSelectScreen extends StatelessWidget {
   const TopicSelectScreen({super.key});
 
@@ -139,6 +140,7 @@ class BottomButtons extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => NicknameSelectScreen(),
                   ),
+
                 );
               },
               style: ElevatedButton.styleFrom(
