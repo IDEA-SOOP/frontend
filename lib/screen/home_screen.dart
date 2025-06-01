@@ -43,6 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
@@ -98,7 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const HomeBottomNav(),
+      bottomNavigationBar: HomeBottomNav(
+        currentIndex: _selectedIndex,
+      ),
     );
   }
 }
@@ -148,16 +152,28 @@ class HomeAppBar extends StatelessWidget {
 }
 
 class HomeBottomNav extends StatelessWidget {
-  const HomeBottomNav({super.key});
+  final int currentIndex;
+
+  const HomeBottomNav({
+    super.key,
+    required this.currentIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 90,
       child: BottomNavigationBar(
+        currentIndex: currentIndex,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.forest_rounded), label: "home"),
-          BottomNavigationBarItem(icon: Icon(Icons.description_outlined), label: "idea block"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.forest_rounded),
+            label: "home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.description_outlined),
+            label: "idea block",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: "community"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
         ],
@@ -212,7 +228,10 @@ class HomeQuestionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("오늘의 질문", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          const Text(
+            "오늘의 질문",
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 15),
           const Text("최근 가장 영감을 준 일은 무엇인가요?", style: TextStyle(fontSize: 13)),
           const SizedBox(height: 15),
@@ -241,7 +260,10 @@ class HomeQuestionCard extends StatelessWidget {
           ] else ...[
             if (!isAnswering) ...[
               const Divider(color: Colors.grey, thickness: 1),
-              Text(savedAnswer!, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+              Text(
+                savedAnswer!,
+                style: const TextStyle(fontSize: 13, color: Colors.black87),
+              ),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -255,7 +277,10 @@ class HomeQuestionCard extends StatelessWidget {
                         side: const BorderSide(color: Colors.black),
                       ),
                     ),
-                    child: const Text("수정", style: TextStyle(fontSize: 13, color: Colors.white)),
+                    child: const Text(
+                      "수정",
+                      style: TextStyle(fontSize: 13, color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -294,9 +319,7 @@ class _AnswerField extends StatelessWidget {
           controller: controller,
           maxLines: 4,
           decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             hintText: isEdit ? null : "여기에 당신의 생각을 자유롭게 적어보세요.",
             hintStyle: const TextStyle(fontSize: 13, color: Colors.black),
           ),
@@ -314,7 +337,10 @@ class _AnswerField extends StatelessWidget {
                   side: const BorderSide(color: Colors.black),
                 ),
               ),
-              child: const Text('취소', style: TextStyle(fontSize: 13, color: Colors.black)),
+              child: const Text(
+                '취소',
+                style: TextStyle(fontSize: 13, color: Colors.black),
+              ),
             ),
             const SizedBox(width: 10),
             ElevatedButton(
@@ -326,7 +352,10 @@ class _AnswerField extends StatelessWidget {
                   side: const BorderSide(color: Colors.black),
                 ),
               ),
-              child: Text(isEdit ? '수정' : '등록', style: const TextStyle(fontSize: 13, color: Colors.white)),
+              child: Text(
+                isEdit ? '수정' : '등록',
+                style: const TextStyle(fontSize: 13, color: Colors.white),
+              ),
             ),
           ],
         ),

@@ -10,6 +10,8 @@ class MyPageScreen extends StatefulWidget {
 }
 
 class _MyPageScreenState extends State<MyPageScreen> {
+  int _selectedIndex = 3;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +29,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const HomeBottomNav(),
+      bottomNavigationBar: HomeBottomNav(currentIndex: _selectedIndex),
     );
   }
 }
@@ -231,15 +233,23 @@ class MyPageSettingCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: backgroundColorStrong,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(15), ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(
             children: [
               _SettingRow(icon: Icons.dashboard, label: '내 카테고리', onTap: () {}),
-              _SettingRow(icon: Icons.notifications_none, label: '알림 설정', onTap: () {}),
-              _SettingRow(icon: Icons.help_outline, label: '도움말 / 지원', onTap: () {}),
+              _SettingRow(
+                icon: Icons.notifications_none,
+                label: '알림 설정',
+                onTap: () {},
+              ),
+              _SettingRow(
+                icon: Icons.help_outline,
+                label: '도움말 / 지원',
+                onTap: () {},
+              ),
             ],
           ),
         ),
@@ -253,7 +263,11 @@ class _SettingRow extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _SettingRow({required this.icon, required this.label, required this.onTap});
+  const _SettingRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -265,12 +279,7 @@ class _SettingRow extends StatelessWidget {
           children: [
             Icon(icon, color: Colors.black87),
             SizedBox(width: 20),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
+            Expanded(child: Text(label, style: TextStyle(fontSize: 16))),
             Icon(Icons.chevron_right, color: Colors.black54),
           ],
         ),
