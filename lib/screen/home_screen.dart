@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
+import 'package:idea_soop/screen/HistoryView.dart';
 import 'package:intl/intl.dart';
 
 //  날짜 서수 접미사 함수
@@ -81,10 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SizedBox(height: 5),
                         Text(
                           formattedDate,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontFamily: 'Poppins',
-                          ),
+                          style: TextStyle(fontSize: 15, fontFamily: 'Poppins'),
                         ),
                       ],
                     ),
@@ -177,7 +175,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  
                                 ),
                                 hintText: "여기에 당신의 생각을 자유롭게 적어보세요.",
                                 hintStyle: TextStyle(
@@ -372,7 +369,15 @@ class _HomeScreenState extends State<HomeScreen> {
               label: "home",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.description_outlined),
+              icon: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HistoryView()),
+                  );
+                },
+                icon: Icon(Icons.description_outlined),
+              ),
               label: "idea block",
             ),
             BottomNavigationBarItem(
