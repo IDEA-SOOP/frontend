@@ -101,9 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: HomeBottomNav(
-        currentIndex: _selectedIndex,
-      ),
+      bottomNavigationBar: HomeBottomNav(currentIndex: _selectedIndex),
     );
   }
 }
@@ -155,10 +153,7 @@ class HomeAppBar extends StatelessWidget {
 class HomeBottomNav extends StatelessWidget {
   final int currentIndex;
 
-  const HomeBottomNav({
-    super.key,
-    required this.currentIndex,
-  });
+  const HomeBottomNav({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -166,17 +161,25 @@ class HomeBottomNav extends StatelessWidget {
       height: 90,
       child: BottomNavigationBar(
         currentIndex: currentIndex,
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.forest_rounded),
             label: "home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.description_outlined),
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoryView()),
+                );
+              },
+              icon: Icon(Icons.description_outlined),
+            ),
             label: "idea block",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: "community"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
+          const BottomNavigationBarItem(icon: Icon(Icons.people), label: "community"),
+          const BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
         ],
         backgroundColor: backgroundColor,
         type: BottomNavigationBarType.fixed,
