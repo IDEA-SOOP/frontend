@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
+import 'package:idea_soop/screen/HistoryViewSearch.dart';
+import 'package:idea_soop/screen/home_screen.dart';
 
 class HistoryView extends StatefulWidget {
   @override
@@ -94,7 +96,15 @@ class _HistoryViewState extends State<HistoryView> {
                   },
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.search),
+                IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoryViewSearch()),
+                );
+              },
+              icon: Icon(Icons.search),
+            ),
               ],
             ),
             const SizedBox(height: 16),
