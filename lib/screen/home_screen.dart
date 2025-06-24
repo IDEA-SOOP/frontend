@@ -162,8 +162,16 @@ class HomeBottomNav extends StatelessWidget {
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.forest_rounded),
+          BottomNavigationBarItem(
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              },
+              icon: const Icon(Icons.forest_rounded),
+            ),
             label: "home",
           ),
           BottomNavigationBarItem(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
+import 'package:idea_soop/screen/HistoryViewSearch.dart';
+import 'package:idea_soop/screen/home_screen.dart';
 
 class HistoryView extends StatefulWidget {
   @override
@@ -86,7 +88,15 @@ class _HistoryViewState extends State<HistoryView> {
                   },
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.search),
+                IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoryViewSearch()),
+                );
+              },
+              icon: Icon(Icons.search),
+            ),
               ],
             ),
             const SizedBox(height: 16),
@@ -166,6 +176,7 @@ class _HistoryViewState extends State<HistoryView> {
         ),
       ),
       // 하단 네비게이션 등 추가 가능
+      bottomNavigationBar: HomeBottomNav(currentIndex: 1,),
     );
   }
 }
