@@ -127,12 +127,12 @@ class HomeAppBar extends StatelessWidget {
                 children: [
                   const Text(
                     "안녕하세요, 00님",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 8),
                   Text(
                     formattedDate,
-                    style: const TextStyle(fontSize: 15, fontFamily: 'Poppins'),
+                    style: const TextStyle(fontSize: 16,),
                   ),
                 ],
               ),
@@ -349,33 +349,37 @@ class _AnswerField extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            ElevatedButton(
-              onPressed: onCancel,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: backgroundColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: const BorderSide(color: Colors.black),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: onCancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: backgroundColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(color: Colors.black),
+                  ),
                 ),
-              ),
-              child: const Text(
-                '취소',
-                style: TextStyle(fontSize: 13, color: Colors.black),
+                child: const Text(
+                  '취소',
+                  style: TextStyle(fontSize: 13, color: Colors.black),
+                ),
               ),
             ),
             const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: onSave,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: pointColorStrong,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: const BorderSide(color: Colors.black),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: onSave,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: pointColorStrong,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(color: pointColorStrong),
+                  ),
                 ),
-              ),
-              child: Text(
-                isEdit ? '수정' : '등록',
-                style: const TextStyle(fontSize: 13, color: Colors.white),
+                child: Text(
+                  isEdit ? '수정' : '확인',
+                  style: const TextStyle(fontSize: 13, color: Colors.white),
+                ),
               ),
             ),
           ],
