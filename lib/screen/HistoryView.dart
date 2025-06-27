@@ -134,46 +134,46 @@ class _HistoryViewState extends State<HistoryView> {
           ],
         ),
       ),
-      bottomNavigationBar: CommonBottomNavigationBar(currentIndex: 1),
+      bottomNavigationBar: HomeBottomNav(currentIndex: 1),
     );
   }
 }
 
-// 공통 BottomNavigationBar 위젯
-class CommonBottomNavigationBar extends StatelessWidget {
-  final int currentIndex;
+// 공통 BottomNavigationBar 위젯 (사용 X)
+// class CommonBottomNavigationBar extends StatelessWidget {
+//   final int currentIndex;
 
-  const CommonBottomNavigationBar({required this.currentIndex, Key? key})
-    : super(key: key);
+//   const CommonBottomNavigationBar({required this.currentIndex, Key? key})
+//     : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 90,
-      child: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.forest_rounded),
-            label: "home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.description_outlined),
-            label: "idea block",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: "community"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
-        ],
-        backgroundColor: backgroundColor,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: pointColorStrong,
-        unselectedItemColor: Colors.grey[500],
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        currentIndex: currentIndex,
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       height: 90,
+//       child: BottomNavigationBar(
+//         items: [
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.forest_rounded),
+//             label: "home",
+//           ),
+//           BottomNavigationBarItem(
+//             icon: Icon(Icons.description_outlined),
+//             label: "idea block",
+//           ),
+//           BottomNavigationBarItem(icon: Icon(Icons.people), label: "community"),
+//           BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
+//         ],
+//         backgroundColor: backgroundColor,
+//         type: BottomNavigationBarType.fixed,
+//         selectedItemColor: pointColorStrong,
+//         unselectedItemColor: Colors.grey[500],
+//         showSelectedLabels: false,
+//         showUnselectedLabels: false,
+//         currentIndex: currentIndex,
+//       ),
+//     );
+//   }
+// }
 
 // 통합된 메모 카드 위젯
 class MemoCard extends StatelessWidget {
@@ -397,7 +397,7 @@ class TodayQuestionDetailView extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: CommonBottomNavigationBar(currentIndex: 1),
+      bottomNavigationBar: HomeBottomNav(currentIndex: 1),
     );
   }
 }
@@ -438,7 +438,7 @@ class MemoDetailCardView extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: CommonBottomNavigationBar(currentIndex: 1),
+      bottomNavigationBar: HomeBottomNav(currentIndex: 1),
     );
   }
 }
