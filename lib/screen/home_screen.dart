@@ -127,12 +127,12 @@ class HomeAppBar extends StatelessWidget {
                 children: [
                   const Text(
                     "안녕하세요, 00님",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 8),
                   Text(
                     formattedDate,
-                    style: const TextStyle(fontSize: 15, fontFamily: 'Poppins'),
+                    style: const TextStyle(fontSize: 16,),
                   ),
                 ],
               ),
@@ -186,8 +186,14 @@ class HomeBottomNav extends StatelessWidget {
             ),
             label: "idea block",
           ),
-          const BottomNavigationBarItem(icon: Icon(Icons.people), label: "community"),
-          const BottomNavigationBarItem(icon: Icon(Icons.person), label: "user"),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: "community",
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "user",
+          ),
         ],
         backgroundColor: backgroundColor,
         type: BottomNavigationBarType.fixed,
@@ -223,12 +229,11 @@ class HomeQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(15),
+      margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -240,61 +245,57 @@ class HomeQuestionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "오늘의 질문",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              Expanded(
+                child: const Text(
+                  "오늘의 질문",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              if (!isAnswering)
+                IconButton(
+                  onPressed: (savedAnswer == null || savedAnswer == "") ? onStartAnswer : onEditAnswer,
+                  icon: Icon(Icons.edit_rounded),
+                ),
+            ],
           ),
           const SizedBox(height: 15),
-          const Text("최근 가장 영감을 준 일은 무엇인가요?", style: TextStyle(fontSize: 13)),
-          const SizedBox(height: 15),
+          const Text("최근 가장 영감을 준 일은 무엇인가요?", style: TextStyle(fontSize: 16)),
+          const SizedBox(height: 12),
+
           if (savedAnswer == null || savedAnswer == "") ...[
             if (!isAnswering)
-              ElevatedButton(
-                onPressed: onStartAnswer,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: pointColorStrong,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: const BorderSide(color: Colors.black),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(color: textColorThird, height: 10),
+                  SizedBox(height: 12),
+                  Text(
+                    "오늘은 어떤 생각이 떠오르셨나요?\n한 줄 남겨보세요.",
+                    style: TextStyle(color: textColorThird, fontSize: 12),
                   ),
-                ),
-                child: const Center(
-                  child: Text("답변 작성", style: TextStyle(color: Colors.white)),
-                ),
+                ],
               )
             else
-              _AnswerField(
-                controller: answerController,
-                onCancel: onCancel,
-                onSave: onSave,
-                isEdit: false,
+              Column(
+                children: [
+                  SizedBox(height: 12,),
+                  _AnswerField(
+                    controller: answerController,
+                    onCancel: onCancel,
+                    onSave: onSave,
+                    isEdit: false,
+                  ),
+                ],
               ),
           ] else ...[
             if (!isAnswering) ...[
-              const Divider(color: Colors.grey, thickness: 1),
+              Divider(color: textColorThird, height: 10),
+              SizedBox(height: 15),
               Text(
                 savedAnswer!,
-                style: const TextStyle(fontSize: 13, color: Colors.black87),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Spacer(),
-                  ElevatedButton(
-                    onPressed: onEditAnswer,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: pointColorStrong,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: const BorderSide(color: Colors.black),
-                      ),
-                    ),
-                    child: const Text(
-                      "수정",
-                      style: TextStyle(fontSize: 13, color: Colors.white),
-                    ),
-                  ),
-                ],
+                style: const TextStyle(fontSize: 16, color: textColorFirst),
               ),
             ] else
               _AnswerField(
@@ -304,6 +305,7 @@ class HomeQuestionCard extends StatelessWidget {
                 isEdit: true,
               ),
           ],
+          SizedBox(height: 15),
         ],
       ),
     );
@@ -327,46 +329,57 @@ class _AnswerField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextField(
-          controller: controller,
-          maxLines: 4,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            hintText: isEdit ? null : "여기에 당신의 생각을 자유롭게 적어보세요.",
-            hintStyle: const TextStyle(fontSize: 13, color: Colors.black),
+        Container(
+          decoration: BoxDecoration(
+            color: backgroundColorStrong,
+            borderRadius: BorderRadius.circular(10)
+          ),
+          child: TextField(
+            controller: controller,
+            maxLines: 4,
+            decoration: InputDecoration(  
+              border: InputBorder.none,      
+              contentPadding: EdgeInsets.all(10),    
+              hintText: isEdit ? null : "여기에 당신의 생각을 자유롭게 적어보세요.",
+              hintStyle: const TextStyle(fontSize: 13, color: textColorThird),
+            ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            ElevatedButton(
-              onPressed: onCancel,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: backgroundColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: const BorderSide(color: Colors.black),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: onCancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: backgroundColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(color: Colors.black),
+                  ),
                 ),
-              ),
-              child: const Text(
-                '취소',
-                style: TextStyle(fontSize: 13, color: Colors.black),
+                child: const Text(
+                  '취소',
+                  style: TextStyle(fontSize: 13, color: Colors.black),
+                ),
               ),
             ),
             const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: onSave,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: pointColorStrong,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: const BorderSide(color: Colors.black),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: onSave,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: pointColorStrong,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(color: pointColorStrong),
+                  ),
                 ),
-              ),
-              child: Text(
-                isEdit ? '수정' : '등록',
-                style: const TextStyle(fontSize: 13, color: Colors.white),
+                child: Text(
+                  isEdit ? '수정' : '확인',
+                  style: const TextStyle(fontSize: 13, color: Colors.white),
+                ),
               ),
             ),
           ],
