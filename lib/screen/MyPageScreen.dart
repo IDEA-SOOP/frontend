@@ -18,14 +18,24 @@ class _MyPageScreenState extends State<MyPageScreen> {
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              MyPageAppBar(),
-              MyPageUserInfo(),
-              MyPageLogCard(),
-              MyPageTreeStateCard(),
-              MyPageSettingCard(),
-            ],
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  90, // 90: bottom nevigation bar's height
+            ),
+            child: IntrinsicHeight(
+              child: Column(
+                children: [
+                  MyPageAppBar(),
+                  Divider(color: Colors.grey.withOpacity(0.2)),
+                  MyPageUserInfo(),
+                  MyPageLogCard(),
+                  Spacer(),
+                  MyPageSettingCard(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -41,7 +51,7 @@ class MyPageAppBar extends StatelessWidget {
       width: double.infinity,
       height: 100,
       child: Padding(
-        padding: EdgeInsets.all(25),
+        padding: EdgeInsets.all(20),
         child: Row(
           children: [
             Expanded(
@@ -94,7 +104,7 @@ class MyPageUserInfo extends StatelessWidget {
                     const Text(
                       "000님",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -102,7 +112,7 @@ class MyPageUserInfo extends StatelessWidget {
                     GestureDetector(
                       onTap: () {},
                       child: const Text(
-                        "내 정보 보기",
+                        "함께한지 nn일째",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
@@ -122,36 +132,139 @@ class MyPageLogCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Container(
-        margin: EdgeInsets.all(25),
+        margin: EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(15),
+          color: backgroundColorStrong,
+          borderRadius: BorderRadius.circular(32),
         ),
 
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
           children: [
-            Expanded(
-              child: _LogInfo(
-                title: "씨앗 단계",
-                subtitle: "1/4 단계",
-                imgAsset: 'assets/images/seed0.png',
-              ),
-            ),
-            SizedBox(
-              height: 70,
-              child: VerticalDivider(color: Colors.grey, thickness: 1),
-            ),
-            Expanded(
-              child: _LogInfo(
-                title: "답변/메모",
-                subtitle: "5/15",
-                imgAsset: 'assets/images/edit_note.png',
-              ),
+            MyPageTreeStateCard(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: _LogInfo(
+                    title: "씨앗 단계",
+                    subtitle: "1/4 단계",
+                    imgAsset: 'assets/images/seed0.png',
+                  ),
+                ),
+                SizedBox(width: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      iconSize: 17,
+                      onPressed: () => popSeedStep(context),
+                      icon: Icon(Icons.info_outline),
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(), // 불필요한 여백 제거
+                    ),
+                    SizedBox(
+                      height: 70,
+                      child: VerticalDivider(thickness: 1, color: Colors.grey),
+                    ),
+                    SizedBox(width: 17),
+                  ],
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: _LogInfo(
+                    title: "답변/메모",
+                    subtitle: "5/15",
+                    imgAsset: 'assets/images/edit_note.png',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void popSeedStep(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // 바깥 클릭 시 닫기 여부
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: backgroundColor, // 완전 투명 배경도 가능
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '씨앗 단계',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+                SizedBox(
+                  height: 70,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Image.asset(
+                        'assets/images/seed0.png',
+                        width: 40,
+                      ),
+                      Image.asset(
+                        'assets/images/seed1.png',
+                        width: 50,
+                      ),
+                      Image.asset(
+                        'assets/images/seed2.png',
+                        width: 60,
+                      ),
+                      Image.asset(
+                        'assets/images/seed3.png',
+                        width: 60,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  '작은 생각 하나가 씨앗이 돼요.\n씨앗을 키워서 나무 한 그루를 완성해보세요!',
+                  style: TextStyle(fontSize: 14, ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: pointColorStrong,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('확인', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -169,11 +282,16 @@ class _LogInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(25),
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: 55, maxWidth: 100),
       child: Row(
         children: [
-          Image.asset(imgAsset, height: 50, fit: BoxFit.fitHeight),
+          Expanded(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: 50),
+              child: Image.asset(imgAsset, fit: BoxFit.fitHeight),
+            ),
+          ),
           SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,10 +304,10 @@ class _LogInfo extends StatelessWidget {
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 4),
               Text(
                 subtitle,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
           ),
@@ -210,13 +328,13 @@ class MyPageTreeStateCard extends StatelessWidget {
           children: [
             Image.asset(
               'assets/images/seed0.png',
-              height: 100,
+              height: 60,
               fit: BoxFit.fitHeight,
             ),
             SizedBox(height: 15),
             Text(
               "오늘, 생각 한 알을 심었어요",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/HistoryView.dart';
+import 'package:idea_soop/screen/MyPageScreen.dart';
 import 'package:intl/intl.dart';
 
 // 날짜 서수 접미사 함수
@@ -190,8 +191,16 @@ class HomeBottomNav extends StatelessWidget {
             icon: Icon(Icons.people),
             label: "community",
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+          BottomNavigationBarItem(
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyPageScreen()),
+                );
+              },
+              icon: Icon(Icons.person),
+            ),
             label: "user",
           ),
         ],
