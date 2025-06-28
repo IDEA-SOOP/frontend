@@ -28,7 +28,9 @@ String formatDateWithSuffix(DateTime date) {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? nickname;
+
+  const HomeScreen({super.key, this.nickname});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -55,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Column(
         children: [
-          HomeAppBar(formattedDate: formattedDate),
+          HomeAppBar(formattedDate: formattedDate, nickname: widget.nickname),
           Expanded(
             child: Stack(
               children: [
@@ -109,7 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class HomeAppBar extends StatelessWidget {
   final String formattedDate;
-  const HomeAppBar({super.key, required this.formattedDate});
+  final String? nickname;
+
+  const HomeAppBar({super.key, required this.formattedDate, this.nickname});
 
   @override
   Widget build(BuildContext context) {
@@ -126,9 +130,12 @@ class HomeAppBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "안녕하세요, 00님",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    "안녕하세요, ${nickname ?? '사용자'}님",
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(formattedDate, style: const TextStyle(fontSize: 16)),
