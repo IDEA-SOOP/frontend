@@ -131,10 +131,7 @@ class HomeAppBar extends StatelessWidget {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    formattedDate,
-                    style: const TextStyle(fontSize: 16,),
-                  ),
+                  Text(formattedDate, style: const TextStyle(fontSize: 16)),
                 ],
               ),
             ),
@@ -171,7 +168,11 @@ class HomeBottomNav extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => HomeScreen()),
                 );
               },
-              icon: const Icon(Icons.forest_rounded),
+              icon: Image.asset(
+                'assets/images/bottomicon_1.png',
+                width: 35,
+                height: 35,
+              ),
             ),
             label: "home",
           ),
@@ -183,12 +184,28 @@ class HomeBottomNav extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => HistoryView()),
                 );
               },
-              icon: Icon(Icons.description_outlined),
+              icon: Image.asset(
+                'assets/images/bottomicon_22.png',
+                width: 35,
+                height: 35,
+              ),
             ),
             label: "idea block",
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.people),
+          BottomNavigationBarItem(
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HistoryView()),
+                );
+              },
+              icon: Image.asset(
+                'assets/images/bottomicon_3.png',
+                width: 35,
+                height: 35,
+              ),
+            ),
             label: "community",
           ),
           BottomNavigationBarItem(
@@ -199,7 +216,11 @@ class HomeBottomNav extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => MyPageScreen()),
                 );
               },
-              icon: Icon(Icons.person),
+              icon: Image.asset(
+                'assets/images/bottomicon_4.png',
+                width: 35,
+                height: 35,
+              ),
             ),
             label: "user",
           ),
@@ -264,7 +285,10 @@ class HomeQuestionCard extends StatelessWidget {
               ),
               if (!isAnswering)
                 IconButton(
-                  onPressed: (savedAnswer == null || savedAnswer == "") ? onStartAnswer : onEditAnswer,
+                  onPressed:
+                      (savedAnswer == null || savedAnswer == "")
+                          ? onStartAnswer
+                          : onEditAnswer,
                   icon: Icon(Icons.edit_rounded),
                 ),
             ],
@@ -289,7 +313,7 @@ class HomeQuestionCard extends StatelessWidget {
             else
               Column(
                 children: [
-                  SizedBox(height: 12,),
+                  SizedBox(height: 12),
                   _AnswerField(
                     controller: answerController,
                     onCancel: onCancel,
@@ -341,14 +365,14 @@ class _AnswerField extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: backgroundColorStrong,
-            borderRadius: BorderRadius.circular(10)
+            borderRadius: BorderRadius.circular(10),
           ),
           child: TextField(
             controller: controller,
             maxLines: 4,
-            decoration: InputDecoration(  
-              border: InputBorder.none,      
-              contentPadding: EdgeInsets.all(10),    
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(10),
               hintText: isEdit ? null : "여기에 당신의 생각을 자유롭게 적어보세요.",
               hintStyle: const TextStyle(fontSize: 13, color: textColorThird),
             ),
@@ -382,7 +406,7 @@ class _AnswerField extends StatelessWidget {
                   backgroundColor: pointColorStrong,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
-                    side: const BorderSide(color: pointColorStrong),
+                    side: const BorderSide(color: activatedNextbuttonColor),
                   ),
                 ),
                 child: Text(

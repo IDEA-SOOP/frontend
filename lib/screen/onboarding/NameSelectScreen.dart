@@ -131,24 +131,6 @@ class _NicknameSelectScreenState extends State<NicknameSelectScreen> {
                 ),
               ),
             ),
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  );
-                },
-                child: const Text(
-                  '건너뛰기',
-                  style: TextStyle(
-                    color: textColorThird,
-                    fontSize: 12,
-                    fontFamily: 'NanumSquareRound',
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
