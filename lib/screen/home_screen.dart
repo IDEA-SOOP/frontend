@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
+import 'package:idea_soop/screen/CharacterScreen.dart';
 import 'package:idea_soop/screen/HistoryView.dart';
 import 'package:idea_soop/screen/MyPageScreen.dart';
 import 'package:intl/intl.dart';
@@ -159,69 +160,53 @@ class HomeBottomNav extends StatelessWidget {
       height: 90,
       child: BottomNavigationBar(
         currentIndex: currentIndex,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+              break;
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HistoryView()),
+              );
+              break;
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CharacterScreen()),
+              );
+              break;
+            case 3:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPageScreen()),
+              );
+              break;
+          }
+        },
         items: [
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_1.png',
-                width: 35,
-                height: 35,
-              ),
-            ),
+            icon: Image.asset('assets/images/bottomicon_1.png', width: 35, height: 35, fit: BoxFit.fill,),
+            activeIcon: Image.asset('assets/images/bottomicon_1s.png', width: 35, height: 35, fit: BoxFit.fill,),
             label: "home",
           ),
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HistoryView()),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_22.png',
-                width: 35,
-                height: 35,
-              ),
-            ),
-            label: "idea block",
+            icon: Image.asset('assets/images/bottomicon_22.png', width: 35, height: 35, fit: BoxFit.fill,),
+            activeIcon: Image.asset('assets/images/bottomicon_2s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            label: "history view",
           ),
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HistoryView()),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_3.png',
-                width: 35,
-                height: 35,
-              ),
-            ),
-            label: "community",
+            icon: Image.asset('assets/images/bottomicon_3.png', width: 35, height: 35, fit: BoxFit.fill,),
+            activeIcon: Image.asset('assets/images/bottomicon_3s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            label: "style",
           ),
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyPageScreen()),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_4.png',
-                width: 35,
-                height: 35,
-              ),
-            ),
+            icon: Image.asset('assets/images/bottomicon_4.png', width: 35, height: 35, fit: BoxFit.fill,),
+            activeIcon: Image.asset('assets/images/bottomicon_4s.png', width: 35, height: 35, fit: BoxFit.fill,),
             label: "user",
           ),
         ],
@@ -235,6 +220,7 @@ class HomeBottomNav extends StatelessWidget {
     );
   }
 }
+
 
 class HomeQuestionCard extends StatelessWidget {
   final bool isAnswering;
