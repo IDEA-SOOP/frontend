@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:idea_soop/screen/onboarding/CharacterSelectScreen.dart';
+import 'package:idea_soop/services/api_service.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-import 'package:http/http.dart' as http;
 
 class KakaoLoginbutton extends StatelessWidget {
   const KakaoLoginbutton({Key? key}) : super(key: key);
@@ -17,26 +17,31 @@ class KakaoLoginbutton extends StatelessWidget {
               ? await UserApi.instance.loginWithKakaoTalk()
               : await UserApi.instance.loginWithKakaoAccount();
 
-      final url = Uri.parse(
-        'https://bb71-222-233-108-66.ngrok-free.app/auth/kakao',
-      );
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'accessToken': token.accessToken}),
-      );
+      // 새로운 API 서비스 사용
+      final response = await ApiService.kakaoLogin(token.accessToken);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        //provide
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => CharacterSelectScreen()),
-        );
-      } else {
-        print('백엔드 인증 실패: ${response.body}');
-      }
+      // 응답에서 필요한 정보 추출
+      final userId = response['userId'];
+      final status = response['status'];
+      final nickname = response['nickname'];
+      final jwt = response['jwt'];
+
+      // JWT 토큰을 저장하거나 관리하는 로직 추가 가능
+      // SharedPreferences 등을 사용하여 토큰 저장
+
+      print('로그인 성공: userId=$userId, status=$status, nickname=$nickname');
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => CharacterSelectScreen(userId: userId, jwt: jwt),
+        ),
+      );
     } catch (e) {
       print('카카오 로그인 실패: $e');
+      // 에러 처리 UI 추가 가능
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('로그인에 실패했습니다: $e')));
     }
   }
 

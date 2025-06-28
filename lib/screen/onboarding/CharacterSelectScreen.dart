@@ -3,7 +3,10 @@ import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/onboarding/TopicSelectScreen.dart';
 
 class CharacterSelectScreen extends StatefulWidget {
-  const CharacterSelectScreen({super.key});
+  final int? userId;
+  final String? jwt;
+
+  const CharacterSelectScreen({super.key, this.userId, this.jwt});
 
   @override
   State<CharacterSelectScreen> createState() => _CharacterSelectScreenState();
@@ -11,6 +14,17 @@ class CharacterSelectScreen extends StatefulWidget {
 
 class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
   String? selectedCharacter;
+
+  int _getCharacterId(String characterName) {
+    switch (characterName) {
+      case '곰':
+        return 1;
+      case '여우':
+        return 2;
+      default:
+        return 1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +106,13 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder:
-                                      (context) => const TopicSelectScreen(),
+                                      (context) => TopicSelectScreen(
+                                        userId: widget.userId,
+                                        jwt: widget.jwt,
+                                        selectedCharacterId: _getCharacterId(
+                                          selectedCharacter!,
+                                        ),
+                                      ),
                                 ),
                               );
                             },
@@ -130,7 +150,12 @@ class _CharacterSelectScreenState extends State<CharacterSelectScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const TopicSelectScreen(),
+                      builder:
+                          (context) => TopicSelectScreen(
+                            userId: widget.userId,
+                            jwt: widget.jwt,
+                            selectedCharacterId: 1,
+                          ),
                     ),
                   );
                 },
