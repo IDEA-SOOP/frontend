@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl =
-      'https://7b3c-222-233-108-66.ngrok-free.app'; // HTTPS로 변경
+      'https://870f-211-59-211-217.ngrok-free.app'; // HTTPS로 변경
 
   // 카카오 로그인 API
   static Future<Map<String, dynamic>> kakaoLogin(String accessToken) async {
@@ -208,6 +208,61 @@ class ApiService {
     } catch (e) {
       print('답변 저장 예외: $e');
       throw Exception('답변 저장 오류: $e');
+    }
+  }
+
+  // 오늘의 메모 조회
+  static Future<Map<String, dynamic>?> fetchTodayMemo() async {
+    try {
+      final url = Uri.parse('$baseUrl/memos/today/latest');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+      print('오늘의 메모 조회 요청:');
+      print('- URL: $url');
+      final response = await http.get(url, headers: headers);
+      print('오늘의 메모 조회 응답 상태: [32m${response.statusCode}[0m');
+      print('오늘의 메모 조회 응답 바디: ${response.body}');
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        return jsonDecode(response.body);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('오늘의 메모 조회 예외: $e');
+      return null;
+    }
+  }
+
+  // 히스토리(메모&답변) 리스트 조회
+  static Future<List<Map<String, dynamic>>> fetchHistoryList({
+    String type = 'all',
+  }) async {
+    try {
+      final url = Uri.parse('$baseUrl/history?type=$type');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+      print('/history 리스트 조회 요청: type=$type');
+      print('- URL: $url');
+      final response = await http.get(url, headers: headers);
+      print('/history 리스트 응답 상태: ${response.statusCode}');
+      print('/history 리스트 응답 바디: ${response.body}');
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final data = jsonDecode(response.body);
+        if (data is List) {
+          return List<Map<String, dynamic>>.from(data);
+        } else {
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('/history 리스트 조회 예외: $e');
+      return [];
     }
   }
 }
