@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/onboarding/CharacterSelectScreen.dart';
+import 'package:idea_soop/screen/onboarding/KakaoLoginButton.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -43,20 +44,7 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 56),
               // 카카오 로그인 버튼 placeholder
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => CharacterSelectScreen(),
-                    ),
-                  );
-                },
-                child: Image.asset(
-                  'assets/images/kakao_login.png',
-                  width: 280,
-                  height: 48,
-                ),
-              ),
+              const KakaoLoginbutton(),
             ],
           ),
         ),

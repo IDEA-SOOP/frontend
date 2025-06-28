@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/screen/onboarding/LoadingPage.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
-void main() {
+Future<void> main() async {
+  KakaoSdk.init(nativeAppKey: 'b47f38bedfee8aa3da981065028732cd');
   runApp(const MyApp());
 }
 
