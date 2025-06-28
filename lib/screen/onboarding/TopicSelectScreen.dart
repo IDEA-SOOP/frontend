@@ -3,7 +3,16 @@ import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/onboarding/NameSelectScreen.dart';
 
 class TopicSelectScreen extends StatefulWidget {
-  const TopicSelectScreen({super.key});
+  final int? userId;
+  final String? jwt;
+  final int selectedCharacterId;
+
+  const TopicSelectScreen({
+    super.key,
+    this.userId,
+    this.jwt,
+    this.selectedCharacterId = 1,
+  });
 
   @override
   State<TopicSelectScreen> createState() => _TopicSelectScreenState();
@@ -115,7 +124,16 @@ class _TopicSelectScreenState extends State<TopicSelectScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder:
-                                      (context) => const NicknameSelectScreen(),
+                                      (context) => NicknameSelectScreen(
+                                        userId: widget.userId,
+                                        jwt: widget.jwt,
+                                        selectedCategoryIds:
+                                            selectedIndexes
+                                                .map((index) => index + 1)
+                                                .toList(),
+                                        selectedCharacterId:
+                                            widget.selectedCharacterId,
+                                      ),
                                 ),
                               );
                             },
@@ -152,7 +170,13 @@ class _TopicSelectScreenState extends State<TopicSelectScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const NicknameSelectScreen(),
+                      builder:
+                          (context) => NicknameSelectScreen(
+                            userId: widget.userId,
+                            jwt: widget.jwt,
+                            selectedCategoryIds: [1, 2, 3, 4, 5, 6],
+                            selectedCharacterId: widget.selectedCharacterId,
+                          ),
                     ),
                   );
                 },
