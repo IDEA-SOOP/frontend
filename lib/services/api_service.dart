@@ -127,4 +127,87 @@ class ApiService {
       throw Exception('사용자 정보 업데이트 오류: $e');
     }
   }
+
+  // 오늘의 질문 조회
+  static Future<Map<String, dynamic>> fetchTodayQuestion({String? jwt}) async {
+    try {
+      final url = Uri.parse('$baseUrl/questions/today');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
+      print('오늘의 질문 조회 요청:');
+      print('- URL: $url');
+      print('- JWT: $jwt');
+      print('- JWT is null: ${jwt == null}');
+      print('- JWT isEmpty: ${jwt?.isEmpty}');
+      if (jwt != null && jwt.isNotEmpty) {
+        print('- Authorization 헤더: Bearer $jwt');
+      }
+
+      final response = await http.get(url, headers: headers);
+
+      print('오늘의 질문 조회 응답 상태: ${response.statusCode}');
+      print('오늘의 질문 조회 응답 바디: ${response.body}');
+
+      if (response.statusCode == 200) {
+        if (response.body.isEmpty) {
+          throw Exception('서버에서 빈 응답을 반환했습니다.');
+        }
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+          '오늘의 질문 조회 실패: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      print('오늘의 질문 조회 예외: $e');
+      throw Exception('오늘의 질문 조회 오류: $e');
+    }
+  }
+
+  // 답변 저장
+  static Future<void> submitAnswer({
+    required int questionId,
+    required String content,
+    String? jwt,
+  }) async {
+    try {
+      final url = Uri.parse('$baseUrl/questions/answer');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
+      final body = {'questionId': questionId, 'content': content};
+
+      print('답변 저장 요청:');
+      print('- URL: $url');
+      print('- JWT: ${jwt != null ? "있음" : "없음"}');
+      print('- Body: $body');
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      print('답변 저장 응답 상태: ${response.statusCode}');
+      print('답변 저장 응답 바디: ${response.body}');
+
+      if (response.statusCode != 200) {
+        throw Exception('답변 저장 실패: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('답변 저장 예외: $e');
+      throw Exception('답변 저장 오류: $e');
+    }
+  }
 }
