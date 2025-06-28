@@ -13,18 +13,18 @@ class _TopicSelectScreenState extends State<TopicSelectScreen> {
   final List<String> topics = [
     '일 / 커리어',
     '관계 / 소통',
-    '가치 / 철학',
     '상상 / 창작',
-    '배움 / 탐구',
+    '가치 / 철학',
+    '배움 / 독서',
     '일상 / 취향',
   ];
   final List<String> icons = [
-    'assets/images/work.png',
-    'assets/images/talk.png',
-    'assets/images/talk.png',
-    'assets/images/idea.png',
-    'assets/images/talk.png',
-    'assets/images/talk.png',
+    'assets/images/business_center.png',
+    'assets/images/handshake.png',
+    'assets/images/lightbulb.png',
+    'assets/images/interests.png',
+    'assets/images/auto_stories.png',
+    'assets/images/favorite.png',
   ];
   final Set<int> selectedIndexes = {};
 

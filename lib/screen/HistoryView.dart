@@ -97,14 +97,16 @@ class _HistoryViewState extends State<HistoryView> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HistoryViewSearch()),
-                );
-              },
-              icon: Icon(Icons.search),
-            ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HistoryViewSearch(),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.search),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -280,9 +282,29 @@ class MemoContentCard extends StatelessWidget {
             Text(memo['content'] ?? '', style: TextStyle(fontSize: 12)),
             const SizedBox(height: 130),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.description_outlined, color: Colors.grey[600]),
+                Image.asset('assets/images/edit.png', width: 28, height: 28),
+                Image.asset('assets/images/mic.png', width: 28, height: 28),
+                Image.asset('assets/images/gallery.png', width: 28, height: 28),
+                Container(
+                  width: 80,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: activatedNextbuttonColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '확인',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'NanumSquareRound',
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
@@ -301,11 +323,12 @@ class RelatedMemoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 260,
+      width: 246,
+      height: 140,
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border.all(color: Colors.grey[400]!, width: 1.2),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -453,8 +476,12 @@ List<Widget> buildTagChips(String? tags) {
           padding: const EdgeInsets.only(left: 4),
           child: Chip(
             label: Text(tag),
-            backgroundColor: Color(0xFFF7EDD8),
-            labelStyle: TextStyle(fontSize: 10, color: Colors.brown[700]),
+            backgroundColor: Color(0xFFF0EBCE),
+            side: BorderSide.none,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(60),
+            ),
+            labelStyle: TextStyle(fontSize: 10, color: textColorFirst),
             padding: EdgeInsets.zero,
             visualDensity: VisualDensity.compact,
           ),
