@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/CharacterScreen.dart';
 import 'package:idea_soop/screen/HistoryView.dart';
 import 'package:idea_soop/screen/MyPageScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:idea_soop/services/api_service.dart';
 
 // 날짜 서수 접미사 함수
@@ -43,6 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isAnswering = false;
   final TextEditingController _answerController = TextEditingController();
   String? _savedAnswer;
+
+  late Future<UserProfile> futureProfile;
+  
   // 질문 관련 상태
   int? _questionId;
   String? _questionContent;
@@ -52,6 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    
+    futureProfile = fetchUserProfile();
+  }
+
     _fetchTodayQuestion();
     print('HomeScreen에서 받은 JWT: ${widget.jwt}');
   }
@@ -107,32 +118,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   int _selectedIndex = 0;
-  
+
   @override
   void dispose() {
     _answerController.dispose();
     super.dispose();
   }
 
+
+  final int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final formattedDate = formatDateWithSuffix(now);
 
-    return Scaffold(
-      body: Column(
-        children: [
-          HomeAppBar(formattedDate: formattedDate, nickname: widget.nickname),
-          Expanded(
-            child: Stack(
+    return FutureBuilder<UserProfile>(
+      future: futureProfile,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("에러 발생: ${snapshot.error}"));
+        } else if (snapshot.hasData) {
+          final profile = snapshot.data!;
+          return Scaffold(
+            body: Column(
               children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/home_screen_background.png',
-                    fit: BoxFit.cover,
-                  ),
+                HomeAppBar(
+                  // 변경됨
+                  formattedDate: formattedDate,
+                  profile: profile,
                 ),
-                SingleChildScrollView(
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Image.asset(
+                          'assets/images/background0.png',
+                          height: MediaQuery.of(context).size.height,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      SingleChildScrollView(
                   child: HomeQuestionCard(
                     isAnswering: _isAnswering,
                     savedAnswer: _savedAnswer,
@@ -160,25 +188,47 @@ class _HomeScreenState extends State<HomeScreen> {
                     isLoadingQuestion: _isLoadingQuestion,
                   ),
                 ),
+                      Positioned(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                            child: Image.asset(
+                              'assets${profile.mainAnimalImageUrl}',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: HomeBottomNav(
+            bottomNavigationBar: HomeBottomNav(
         currentIndex: _selectedIndex,
         nickname: widget.nickname,
         jwt: widget.jwt,
       ),
+          );
+        } else {
+          return const Center(child: Text("데이터 없음"));
+        }
+      },
+
     );
   }
 }
 
 class HomeAppBar extends StatelessWidget {
   final String formattedDate;
-  final String? nickname;
+  final UserProfile profile; // 변경됨
 
-  const HomeAppBar({super.key, required this.formattedDate, this.nickname});
+  const HomeAppBar({
+    super.key,
+    required this.formattedDate,
+    required this.profile, // 변경됨
+  });
+
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +246,8 @@ class HomeAppBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "안녕하세요, ${nickname ?? '사용자'}님",
+                    "안녕하세요, ${profile.nickname}님", // 변경됨
+
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -222,15 +273,8 @@ class HomeAppBar extends StatelessWidget {
 
 class HomeBottomNav extends StatelessWidget {
   final int currentIndex;
-  final String? nickname;
-  final String? jwt;
 
-  const HomeBottomNav({
-    super.key,
-    required this.currentIndex,
-    this.nickname,
-    this.jwt,
-  });
+  const HomeBottomNav({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -242,100 +286,87 @@ class HomeBottomNav extends StatelessWidget {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => HomeScreen(nickname: nickname,jwt: jwt)),
               );
               break;
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HistoryView()),
+                MaterialPageRoute(builder: (context) => HistoryView(jwt: jwt)),
               );
               break;
             case 2:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CharacterScreen()),
+                MaterialPageRoute(builder: (context) => CharacterScreen(jwt: jwt)),
               );
               break;
             case 3:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPageScreen()),
+                MaterialPageRoute(builder: (context) => MyPageScreen(jwt: jwt)),
               );
               break;
           }
         },
         items: [
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => HomeScreen(nickname: nickname, jwt: jwt),
-                  ),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_1.png',
-                width: 35,
-                height: 35,
-              ),
+            icon: Image.asset(
+              'assets/images/bottomicon_1.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_1s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
             ),
             label: "home",
           ),
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HistoryView(jwt: jwt),
-                  ),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_22.png',
-                width: 35,
-                height: 35,
-              ),
+            icon: Image.asset(
+              'assets/images/bottomicon_22.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
             ),
-            label: "idea block",
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_2s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            label: "history view",
           ),
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HistoryView(jwt: jwt),
-                  ),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_3.png',
-                width: 35,
-                height: 35,
-              ),
+            icon: Image.asset(
+              'assets/images/bottomicon_3.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
             ),
-            label: "community",
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_3s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            label: "style",
           ),
           BottomNavigationBarItem(
-            icon: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyPageScreen(jwt: jwt),
-                  ),
-                );
-              },
-              icon: Image.asset(
-                'assets/images/bottomicon_4.png',
-                width: 35,
-                height: 35,
-              ),
+            icon: Image.asset(
+              'assets/images/bottomicon_4.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_4s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
             ),
             label: "user",
           ),
@@ -350,7 +381,6 @@ class HomeBottomNav extends StatelessWidget {
     );
   }
 }
-
 
 class HomeQuestionCard extends StatelessWidget {
   final bool isAnswering;
@@ -544,5 +574,50 @@ class _AnswerField extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class UserProfile {
+  final String nickname;
+  final String mainAnimalImageUrl;
+  final String backgroundImageUrl;
+
+  UserProfile({required this.nickname, required this.mainAnimalImageUrl, required this.backgroundImageUrl});
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      nickname: json['nickname'],
+      mainAnimalImageUrl: json['mainAnimalImageUrl'],
+      backgroundImageUrl: json['backgroundImageUrl']
+    );
+  }
+}
+
+Future<String?> loadToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('accessToken');
+}
+
+Future<UserProfile> fetchUserProfile() async {
+  final prefs = await SharedPreferences.getInstance();
+  final jwt = prefs.getString('accessToken');
+
+  final url = Uri.parse(
+    'https://870f-211-59-211-217.ngrok-free.app/home/userinfo',
+  );
+  final response = await http.get(
+    url,
+    headers: {'Authorization': 'Bearer $jwt'},
+  );
+
+  print("내 토큰: $jwt");
+  print('응답 상태 코드: ${response.statusCode}');
+  print('응답 본문: ${response.body}');
+
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body);
+    return UserProfile.fromJson(jsonData);
+  } else {
+    throw Exception('유저 정보를 불러오지 못했습니다.');
   }
 }

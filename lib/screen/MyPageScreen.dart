@@ -107,7 +107,7 @@ class MyPageUserInfo extends StatelessWidget {
   // String? profileImageUrl; // 예: null 또는 'https://example.com/my.jpg'
 
   Widget build(BuildContext context) {
-    final profileImageUrl = profile.seedStageImageUrl;
+    final profileImageUrl = "assets/images/bear.png";
 
     return Container(
       child: Padding(
@@ -476,15 +476,15 @@ Future<String?> loadToken() async {
 
 Future<UserProfile> fetchUserProfile() async {
   final prefs = await SharedPreferences.getInstance();
-  final jwtt = prefs.getString('accessToken');
+  final jwt = prefs.getString('accessToken');
 
   final url = Uri.parse('https://870f-211-59-211-217.ngrok-free.app/mypage');
   final response = await http.get(
     url,
-    headers: {'Authorization': 'Bearer $jwtt'},
+    headers: {'Authorization': 'Bearer $jwt'},
   );
 
-  print("내 토큰2: $jwtt");
+  print("내 토큰: $jwt");
   print('응답 상태 코드: ${response.statusCode}');
   print('응답 본문: ${response.body}');
 
