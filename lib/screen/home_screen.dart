@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    futureProfile = fetchUserProfile(); 
+    futureProfile = fetchUserProfile();
   }
 
   @override
@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final now = DateTime.now();
     final formattedDate = formatDateWithSuffix(now);
 
-    return FutureBuilder<UserProfile>( 
+    return FutureBuilder<UserProfile>(
       future: futureProfile,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -77,7 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
           return Scaffold(
             body: Column(
               children: [
-                HomeAppBar( // 변경됨
+                HomeAppBar(
+                  // 변경됨
                   formattedDate: formattedDate,
                   profile: profile,
                 ),
@@ -128,10 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           alignment: Alignment.bottomCenter,
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
-                            child: Image.asset('assets${profile.mainAnimalImageUrl}'),
+                            child: Image.asset(
+                              'assets${profile.mainAnimalImageUrl}',
+                            ),
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -175,11 +178,12 @@ class HomeAppBar extends StatelessWidget {
                   Text(
                     "안녕하세요, ${profile.nickname}님", // 변경됨
                     style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  Text(formattedDate,
-                      style: const TextStyle(fontSize: 16)),
+                  Text(formattedDate, style: const TextStyle(fontSize: 16)),
                 ],
               ),
             ),
@@ -496,13 +500,15 @@ class _AnswerField extends StatelessWidget {
 class UserProfile {
   final String nickname;
   final String mainAnimalImageUrl;
+  final String backgroundImageUrl;
 
-  UserProfile({required this.nickname, required this.mainAnimalImageUrl});
+  UserProfile({required this.nickname, required this.mainAnimalImageUrl, required this.backgroundImageUrl});
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       nickname: json['nickname'],
       mainAnimalImageUrl: json['mainAnimalImageUrl'],
+      backgroundImageUrl: json['backgroundImageUrl']
     );
   }
 }
@@ -516,7 +522,9 @@ Future<UserProfile> fetchUserProfile() async {
   final prefs = await SharedPreferences.getInstance();
   final jwt = prefs.getString('accessToken');
 
-  final url = Uri.parse('https://870f-211-59-211-217.ngrok-free.app/home/userinfo');
+  final url = Uri.parse(
+    'https://870f-211-59-211-217.ngrok-free.app/home/userinfo',
+  );
   final response = await http.get(
     url,
     headers: {'Authorization': 'Bearer $jwt'},
