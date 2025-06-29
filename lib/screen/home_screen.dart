@@ -8,6 +8,7 @@ import 'package:idea_soop/screen/HistoryView.dart';
 import 'package:idea_soop/screen/MyPageScreen.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:idea_soop/services/api_service.dart';
 
 // 날짜 서수 접미사 함수
 String getDaySuffix(int day) {
@@ -33,7 +34,10 @@ String formatDateWithSuffix(DateTime date) {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? nickname;
+  final String? jwt;
+
+  const HomeScreen({super.key, this.nickname, this.jwt});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -45,18 +49,82 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _savedAnswer;
 
   late Future<UserProfile> futureProfile;
+  
+  // 질문 관련 상태
+  int? _questionId;
+  String? _questionContent;
+  String? _questionAnswer;
+  bool _isLoadingQuestion = true;
 
   @override
   void initState() {
     super.initState();
+    
     futureProfile = fetchUserProfile();
   }
+
+    _fetchTodayQuestion();
+    print('HomeScreen에서 받은 JWT: ${widget.jwt}');
+  }
+
+  Future<void> _fetchTodayQuestion() async {
+    setState(() {
+      _isLoadingQuestion = true;
+    });
+    try {
+      final data = await ApiService.fetchTodayQuestion(jwt: widget.jwt);
+      setState(() {
+        _questionId = data['questionId'];
+        _questionContent = data['content'];
+        _questionAnswer = data['answer'];
+        _savedAnswer = data['answer'];
+      });
+    } catch (e) {
+      print('질문 조회 실패: $e');
+      setState(() {
+        _questionContent = '질문을 불러오지 못했습니다.';
+      });
+    } finally {
+      setState(() {
+        _isLoadingQuestion = false;
+      });
+    }
+  }
+
+  Future<void> _submitAnswer() async {
+    if (_questionId == null) return;
+    final content = _answerController.text.trim();
+    if (content.isEmpty) return;
+    try {
+      await ApiService.submitAnswer(
+        questionId: _questionId!,
+        content: content,
+        jwt: widget.jwt,
+      );
+      setState(() {
+        _savedAnswer = content;
+        _isAnswering = false;
+        _answerController.clear();
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('답변이 저장되었습니다.')));
+    } catch (e) {
+      print('답변 저장 실패: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('답변 저장 실패: $e')));
+    }
+  }
+
+  int _selectedIndex = 0;
 
   @override
   void dispose() {
     _answerController.dispose();
     super.dispose();
   }
+
 
   final int _selectedIndex = 0;
 
@@ -93,37 +161,33 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       SingleChildScrollView(
-                        child: HomeQuestionCard(
-                          isAnswering: _isAnswering,
-                          savedAnswer: _savedAnswer,
-                          answerController: _answerController,
-                          onCancel: () {
-                            setState(() {
-                              _isAnswering = false;
-                              _answerController.clear();
-                            });
-                          },
-                          onSave: () {
-                            setState(() {
-                              _savedAnswer = _answerController.text;
-                              _isAnswering = false;
-                              _answerController.clear();
-                            });
-                          },
-                          onStartAnswer: () {
-                            setState(() {
-                              _isAnswering = true;
-                              _answerController.clear();
-                            });
-                          },
-                          onEditAnswer: () {
-                            setState(() {
-                              _isAnswering = true;
-                              _answerController.text = _savedAnswer!;
-                            });
-                          },
-                        ),
-                      ),
+                  child: HomeQuestionCard(
+                    isAnswering: _isAnswering,
+                    savedAnswer: _savedAnswer,
+                    answerController: _answerController,
+                    onCancel: () {
+                      setState(() {
+                        _isAnswering = false;
+                        _answerController.clear();
+                      });
+                    },
+                    onSave: _submitAnswer,
+                    onStartAnswer: () {
+                      setState(() {
+                        _isAnswering = true;
+                        _answerController.clear();
+                      });
+                    },
+                    onEditAnswer: () {
+                      setState(() {
+                        _isAnswering = true;
+                        _answerController.text = _savedAnswer ?? '';
+                      });
+                    },
+                    questionContent: _questionContent,
+                    isLoadingQuestion: _isLoadingQuestion,
+                  ),
+                ),
                       Positioned(
                         child: Align(
                           alignment: Alignment.bottomCenter,
@@ -140,12 +204,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            bottomNavigationBar: HomeBottomNav(currentIndex: _selectedIndex),
+            bottomNavigationBar: HomeBottomNav(
+        currentIndex: _selectedIndex,
+        nickname: widget.nickname,
+        jwt: widget.jwt,
+      ),
           );
         } else {
           return const Center(child: Text("데이터 없음"));
         }
       },
+
     );
   }
 }
@@ -159,6 +228,7 @@ class HomeAppBar extends StatelessWidget {
     required this.formattedDate,
     required this.profile, // 변경됨
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -177,6 +247,7 @@ class HomeAppBar extends StatelessWidget {
                 children: [
                   Text(
                     "안녕하세요, ${profile.nickname}님", // 변경됨
+
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -215,25 +286,25 @@ class HomeBottomNav extends StatelessWidget {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
+                MaterialPageRoute(builder: (context) => HomeScreen(nickname: nickname,jwt: jwt)),
               );
               break;
             case 1:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HistoryView()),
+                MaterialPageRoute(builder: (context) => HistoryView(jwt: jwt)),
               );
               break;
             case 2:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CharacterScreen()),
+                MaterialPageRoute(builder: (context) => CharacterScreen(jwt: jwt)),
               );
               break;
             case 3:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyPageScreen()),
+                MaterialPageRoute(builder: (context) => MyPageScreen(jwt: jwt)),
               );
               break;
           }
@@ -319,6 +390,8 @@ class HomeQuestionCard extends StatelessWidget {
   final VoidCallback onSave;
   final VoidCallback onStartAnswer;
   final VoidCallback onEditAnswer;
+  final String? questionContent;
+  final bool isLoadingQuestion;
 
   const HomeQuestionCard({
     super.key,
@@ -329,6 +402,8 @@ class HomeQuestionCard extends StatelessWidget {
     required this.onSave,
     required this.onStartAnswer,
     required this.onEditAnswer,
+    this.questionContent,
+    this.isLoadingQuestion = false,
   });
 
   @override
@@ -369,7 +444,12 @@ class HomeQuestionCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 15),
-          const Text("최근 가장 영감을 준 일은 무엇인가요?", style: TextStyle(fontSize: 16)),
+          isLoadingQuestion
+              ? const Center(child: CircularProgressIndicator())
+              : Text(
+                questionContent ?? "질문이 없습니다.",
+                style: const TextStyle(fontSize: 16),
+              ),
           const SizedBox(height: 12),
 
           if (savedAnswer == null || savedAnswer == "") ...[

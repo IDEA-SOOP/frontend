@@ -27,16 +27,21 @@ class Memo {
       source: map['source'] ?? '',
       title: map['title'] ?? '',
       content: map['content'] ?? '',
-      tags: (map['tags'] ?? '')
-        .split(' ')
-        .where((tag) => tag.trim().isNotEmpty)
-        .toList(),
+      tags:
+          (map['tags'] ?? '')
+              .split(' ')
+              .where((tag) => tag.trim().isNotEmpty)
+              .toList(),
     );
   }
 }
 
-
 class HistoryViewSearch extends StatefulWidget {
+  final String? jwt;
+
+  const HistoryViewSearch({super.key, this.jwt});
+
+  @override
   State<HistoryViewSearch> createState() => _HistoryViewSearchState();
 }
 
@@ -94,7 +99,7 @@ class _HistoryViewSearchState extends State<HistoryViewSearch> {
             SizedBox(height: 50),
             KeywordBox(words: tempKeywords),
             SizedBox(height: 50),
-            MemoBox(memos: tempMemos,),
+            MemoBox(memos: tempMemos),
           ],
         ),
       ),
@@ -147,10 +152,25 @@ class _SearchBarState extends State<SearchBar> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HistoryView()),
+                MaterialPageRoute(
+                  builder:
+                      (context) => HistoryView(
+                        jwt:
+                            (context
+                                        .findAncestorStateOfType<
+                                          _HistoryViewSearchState
+                                        >()
+                                        ?.widget
+                                    as HistoryViewSearch)
+                                .jwt,
+                      ),
+                ),
               );
             },
-            child: Text("취소", style: TextStyle(fontSize: 18,color: textColorFirst)),
+            child: Text(
+              "취소",
+              style: TextStyle(fontSize: 18, color: textColorFirst),
+            ),
           ),
         ],
       ),
@@ -255,7 +275,6 @@ class KeywordBox extends StatelessWidget {
 }
 
 class MemoBox extends StatelessWidget {
-
   final List<Memo> memos;
 
   MemoBox({required this.memos});
@@ -292,7 +311,6 @@ class MemoBox extends StatelessWidget {
   }
 }
 
-
 class MemoCardSmall extends StatelessWidget {
   final Memo memo;
 
@@ -325,7 +343,11 @@ class MemoCardSmall extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             memo.title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColorFirst),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: textColorFirst,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -349,6 +371,7 @@ class MemoCardSmall extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildTag(String tag) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
