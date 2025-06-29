@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/CharacterScreen.dart';
 import 'package:idea_soop/screen/HistoryView.dart';
 import 'package:idea_soop/screen/MyPageScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // 날짜 서수 접미사 함수
 String getDaySuffix(int day) {
@@ -39,77 +43,119 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isAnswering = false;
   final TextEditingController _answerController = TextEditingController();
   String? _savedAnswer;
+
+  late Future<UserProfile> futureProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    futureProfile = fetchUserProfile(); 
+  }
+
   @override
   void dispose() {
     _answerController.dispose();
     super.dispose();
   }
 
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final formattedDate = formatDateWithSuffix(now);
 
-    return Scaffold(
-      body: Column(
-        children: [
-          HomeAppBar(formattedDate: formattedDate),
-          Expanded(
-            child: Stack(
+    return FutureBuilder<UserProfile>( 
+      future: futureProfile,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("에러 발생: ${snapshot.error}"));
+        } else if (snapshot.hasData) {
+          final profile = snapshot.data!;
+          return Scaffold(
+            body: Column(
               children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/home_screen_background.png',
-                    fit: BoxFit.cover,
-                  ),
+                HomeAppBar( // 변경됨
+                  formattedDate: formattedDate,
+                  profile: profile,
                 ),
-                SingleChildScrollView(
-                  child: HomeQuestionCard(
-                    isAnswering: _isAnswering,
-                    savedAnswer: _savedAnswer,
-                    answerController: _answerController,
-                    onCancel: () {
-                      setState(() {
-                        _isAnswering = false;
-                        _answerController.clear();
-                      });
-                    },
-                    onSave: () {
-                      setState(() {
-                        _savedAnswer = _answerController.text;
-                        _isAnswering = false;
-                        _answerController.clear();
-                      });
-                    },
-                    onStartAnswer: () {
-                      setState(() {
-                        _isAnswering = true;
-                        _answerController.clear();
-                      });
-                    },
-                    onEditAnswer: () {
-                      setState(() {
-                        _isAnswering = true;
-                        _answerController.text = _savedAnswer!;
-                      });
-                    },
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Image.asset(
+                          'assets/images/background0.png',
+                          height: MediaQuery.of(context).size.height,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        child: HomeQuestionCard(
+                          isAnswering: _isAnswering,
+                          savedAnswer: _savedAnswer,
+                          answerController: _answerController,
+                          onCancel: () {
+                            setState(() {
+                              _isAnswering = false;
+                              _answerController.clear();
+                            });
+                          },
+                          onSave: () {
+                            setState(() {
+                              _savedAnswer = _answerController.text;
+                              _isAnswering = false;
+                              _answerController.clear();
+                            });
+                          },
+                          onStartAnswer: () {
+                            setState(() {
+                              _isAnswering = true;
+                              _answerController.clear();
+                            });
+                          },
+                          onEditAnswer: () {
+                            setState(() {
+                              _isAnswering = true;
+                              _answerController.text = _savedAnswer!;
+                            });
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                            child: Image.asset('assets${profile.mainAnimalImageUrl}'),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: HomeBottomNav(currentIndex: _selectedIndex),
+            bottomNavigationBar: HomeBottomNav(currentIndex: _selectedIndex),
+          );
+        } else {
+          return const Center(child: Text("데이터 없음"));
+        }
+      },
     );
   }
 }
 
 class HomeAppBar extends StatelessWidget {
   final String formattedDate;
-  const HomeAppBar({super.key, required this.formattedDate});
+  final UserProfile profile; // 변경됨
+
+  const HomeAppBar({
+    super.key,
+    required this.formattedDate,
+    required this.profile, // 변경됨
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -126,12 +172,14 @@ class HomeAppBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "안녕하세요, 00님",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    "안녕하세요, ${profile.nickname}님", // 변경됨
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text(formattedDate, style: const TextStyle(fontSize: 16)),
+                  Text(formattedDate,
+                      style: const TextStyle(fontSize: 16)),
                 ],
               ),
             ),
@@ -188,23 +236,63 @@ class HomeBottomNav extends StatelessWidget {
         },
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_1.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_1s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            icon: Image.asset(
+              'assets/images/bottomicon_1.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_1s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
             label: "home",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_22.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_2s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            icon: Image.asset(
+              'assets/images/bottomicon_22.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_2s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
             label: "history view",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_3.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_3s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            icon: Image.asset(
+              'assets/images/bottomicon_3.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_3s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
             label: "style",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_4.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_4s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            icon: Image.asset(
+              'assets/images/bottomicon_4.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
+            activeIcon: Image.asset(
+              'assets/images/bottomicon_4s.png',
+              width: 35,
+              height: 35,
+              fit: BoxFit.fill,
+            ),
             label: "user",
           ),
         ],
@@ -218,7 +306,6 @@ class HomeBottomNav extends StatelessWidget {
     );
   }
 }
-
 
 class HomeQuestionCard extends StatelessWidget {
   final bool isAnswering;
@@ -403,5 +490,46 @@ class _AnswerField extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class UserProfile {
+  final String nickname;
+  final String mainAnimalImageUrl;
+
+  UserProfile({required this.nickname, required this.mainAnimalImageUrl});
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      nickname: json['nickname'],
+      mainAnimalImageUrl: json['mainAnimalImageUrl'],
+    );
+  }
+}
+
+Future<String?> loadToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('accessToken');
+}
+
+Future<UserProfile> fetchUserProfile() async {
+  final prefs = await SharedPreferences.getInstance();
+  final jwt = prefs.getString('accessToken');
+
+  final url = Uri.parse('https://870f-211-59-211-217.ngrok-free.app/home/userinfo');
+  final response = await http.get(
+    url,
+    headers: {'Authorization': 'Bearer $jwt'},
+  );
+
+  print("내 토큰: $jwt");
+  print('응답 상태 코드: ${response.statusCode}');
+  print('응답 본문: ${response.body}');
+
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body);
+    return UserProfile.fromJson(jsonData);
+  } else {
+    throw Exception('유저 정보를 불러오지 못했습니다.');
   }
 }
