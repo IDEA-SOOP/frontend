@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:idea_soop/screen/onboarding/CharacterSelectScreen.dart';
 import 'package:idea_soop/services/api_service.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KakaoLoginbutton extends StatelessWidget {
   const KakaoLoginbutton({Key? key}) : super(key: key);
@@ -28,8 +29,11 @@ class KakaoLoginbutton extends StatelessWidget {
 
       // JWT 토큰을 저장하거나 관리하는 로직 추가 가능
       // SharedPreferences 등을 사용하여 토큰 저장
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('accessToken', jwt);
 
       print('로그인 성공: userId=$userId, status=$status, nickname=$nickname');
+      print("내 토큰: $jwt");
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
