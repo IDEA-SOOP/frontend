@@ -4,8 +4,11 @@ import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/home_screen.dart';
 
 class MyPageScreen extends StatefulWidget {
-  const MyPageScreen({super.key});
+  final String? jwt;
 
+  const MyPageScreen({super.key, this.jwt});
+
+  @override
   State<MyPageScreen> createState() => _MyPageScreenState();
 }
 

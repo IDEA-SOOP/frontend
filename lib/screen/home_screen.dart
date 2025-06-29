@@ -4,6 +4,7 @@ import 'package:idea_soop/screen/CharacterScreen.dart';
 import 'package:idea_soop/screen/HistoryView.dart';
 import 'package:idea_soop/screen/MyPageScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:idea_soop/services/api_service.dart';
 
 // 날짜 서수 접미사 함수
 String getDaySuffix(int day) {
@@ -29,7 +30,10 @@ String formatDateWithSuffix(DateTime date) {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? nickname;
+  final String? jwt;
+
+  const HomeScreen({super.key, this.nickname, this.jwt});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -40,13 +44,76 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _answerController = TextEditingController();
   String? _savedAnswer;
 
+  // 질문 관련 상태
+  int? _questionId;
+  String? _questionContent;
+  String? _questionAnswer;
+  bool _isLoadingQuestion = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTodayQuestion();
+    print('HomeScreen에서 받은 JWT: ${widget.jwt}');
+  }
+
+  Future<void> _fetchTodayQuestion() async {
+    setState(() {
+      _isLoadingQuestion = true;
+    });
+    try {
+      final data = await ApiService.fetchTodayQuestion(jwt: widget.jwt);
+      setState(() {
+        _questionId = data['questionId'];
+        _questionContent = data['content'];
+        _questionAnswer = data['answer'];
+        _savedAnswer = data['answer'];
+      });
+    } catch (e) {
+      print('질문 조회 실패: $e');
+      setState(() {
+        _questionContent = '질문을 불러오지 못했습니다.';
+      });
+    } finally {
+      setState(() {
+        _isLoadingQuestion = false;
+      });
+    }
+  }
+
+  Future<void> _submitAnswer() async {
+    if (_questionId == null) return;
+    final content = _answerController.text.trim();
+    if (content.isEmpty) return;
+    try {
+      await ApiService.submitAnswer(
+        questionId: _questionId!,
+        content: content,
+        jwt: widget.jwt,
+      );
+      setState(() {
+        _savedAnswer = content;
+        _isAnswering = false;
+        _answerController.clear();
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('답변이 저장되었습니다.')));
+    } catch (e) {
+      print('답변 저장 실패: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('답변 저장 실패: $e')));
+    }
+  }
+
+  int _selectedIndex = 0;
+
   @override
   void dispose() {
     _answerController.dispose();
     super.dispose();
   }
-
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Column(
         children: [
-          HomeAppBar(formattedDate: formattedDate),
+          HomeAppBar(formattedDate: formattedDate, nickname: widget.nickname),
           Expanded(
             child: Stack(
               children: [
@@ -77,13 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _answerController.clear();
                       });
                     },
-                    onSave: () {
-                      setState(() {
-                        _savedAnswer = _answerController.text;
-                        _isAnswering = false;
-                        _answerController.clear();
-                      });
-                    },
+                    onSave: _submitAnswer,
                     onStartAnswer: () {
                       setState(() {
                         _isAnswering = true;
@@ -93,9 +154,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     onEditAnswer: () {
                       setState(() {
                         _isAnswering = true;
-                        _answerController.text = _savedAnswer!;
+                        _answerController.text = _savedAnswer ?? '';
                       });
                     },
+                    questionContent: _questionContent,
+                    isLoadingQuestion: _isLoadingQuestion,
                   ),
                 ),
               ],
@@ -103,14 +166,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: HomeBottomNav(currentIndex: _selectedIndex),
+      bottomNavigationBar: HomeBottomNav(
+        currentIndex: _selectedIndex,
+        nickname: widget.nickname,
+        jwt: widget.jwt,
+      ),
     );
   }
 }
 
 class HomeAppBar extends StatelessWidget {
   final String formattedDate;
-  const HomeAppBar({super.key, required this.formattedDate});
+  final String? nickname;
+
+  const HomeAppBar({super.key, required this.formattedDate, this.nickname});
 
   @override
   Widget build(BuildContext context) {
@@ -127,9 +196,12 @@ class HomeAppBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "안녕하세요, 00님",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    "안녕하세요, ${nickname ?? '사용자'}님",
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(formattedDate, style: const TextStyle(fontSize: 16)),
@@ -151,8 +223,15 @@ class HomeAppBar extends StatelessWidget {
 
 class HomeBottomNav extends StatelessWidget {
   final int currentIndex;
+  final String? nickname;
+  final String? jwt;
 
-  const HomeBottomNav({super.key, required this.currentIndex});
+  const HomeBottomNav({
+    super.key,
+    required this.currentIndex,
+    this.nickname,
+    this.jwt,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -190,23 +269,76 @@ class HomeBottomNav extends StatelessWidget {
         },
         items: [
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_1.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_1s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => HomeScreen(nickname: nickname, jwt: jwt),
+                  ),
+                );
+              },
+              icon: Image.asset(
+                'assets/images/bottomicon_1.png',
+                width: 35,
+                height: 35,
+              ),
+            ),
             label: "home",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_22.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_2s.png', width: 35, height: 35, fit: BoxFit.fill,),
-            label: "history view",
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HistoryView(jwt: jwt),
+                  ),
+                );
+              },
+              icon: Image.asset(
+                'assets/images/bottomicon_22.png',
+                width: 35,
+                height: 35,
+              ),
+            ),
+            label: "idea block",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_3.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_3s.png', width: 35, height: 35, fit: BoxFit.fill,),
-            label: "style",
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HistoryView(jwt: jwt),
+                  ),
+                );
+              },
+              icon: Image.asset(
+                'assets/images/bottomicon_3.png',
+                width: 35,
+                height: 35,
+              ),
+            ),
+            label: "community",
           ),
           BottomNavigationBarItem(
-            icon: Image.asset('assets/images/bottomicon_4.png', width: 35, height: 35, fit: BoxFit.fill,),
-            activeIcon: Image.asset('assets/images/bottomicon_4s.png', width: 35, height: 35, fit: BoxFit.fill,),
+            icon: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyPageScreen(jwt: jwt),
+                  ),
+                );
+              },
+              icon: Image.asset(
+                'assets/images/bottomicon_4.png',
+                width: 35,
+                height: 35,
+              ),
+            ),
             label: "user",
           ),
         ],
@@ -230,6 +362,8 @@ class HomeQuestionCard extends StatelessWidget {
   final VoidCallback onSave;
   final VoidCallback onStartAnswer;
   final VoidCallback onEditAnswer;
+  final String? questionContent;
+  final bool isLoadingQuestion;
 
   const HomeQuestionCard({
     super.key,
@@ -240,6 +374,8 @@ class HomeQuestionCard extends StatelessWidget {
     required this.onSave,
     required this.onStartAnswer,
     required this.onEditAnswer,
+    this.questionContent,
+    this.isLoadingQuestion = false,
   });
 
   @override
@@ -280,7 +416,12 @@ class HomeQuestionCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 15),
-          const Text("최근 가장 영감을 준 일은 무엇인가요?", style: TextStyle(fontSize: 16)),
+          isLoadingQuestion
+              ? const Center(child: CircularProgressIndicator())
+              : Text(
+                questionContent ?? "질문이 없습니다.",
+                style: const TextStyle(fontSize: 16),
+              ),
           const SizedBox(height: 12),
 
           if (savedAnswer == null || savedAnswer == "") ...[

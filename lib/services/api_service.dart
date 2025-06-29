@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl =
-      'https://7b3c-222-233-108-66.ngrok-free.app'; // HTTPS로 변경
+      'https://870f-211-59-211-217.ngrok-free.app'; // HTTPS로 변경
 
   // 카카오 로그인 API
   static Future<Map<String, dynamic>> kakaoLogin(String accessToken) async {
@@ -125,6 +125,187 @@ class ApiService {
     } catch (e) {
       print('사용자 정보 업데이트 예외: $e');
       throw Exception('사용자 정보 업데이트 오류: $e');
+    }
+  }
+
+  // 오늘의 질문 조회
+  static Future<Map<String, dynamic>> fetchTodayQuestion({String? jwt}) async {
+    try {
+      final url = Uri.parse('$baseUrl/questions/today');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
+      print('오늘의 질문 조회 요청:');
+      print('- URL: $url');
+      print('- JWT: $jwt');
+      print('- JWT is null: ${jwt == null}');
+      print('- JWT isEmpty: ${jwt?.isEmpty}');
+      if (jwt != null && jwt.isNotEmpty) {
+        print('- Authorization 헤더: Bearer $jwt');
+      }
+
+      final response = await http.get(url, headers: headers);
+
+      print('오늘의 질문 조회 응답 상태: ${response.statusCode}');
+      print('오늘의 질문 조회 응답 바디: ${response.body}');
+
+      if (response.statusCode == 200) {
+        if (response.body.isEmpty) {
+          throw Exception('서버에서 빈 응답을 반환했습니다.');
+        }
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+          '오늘의 질문 조회 실패: ${response.statusCode} - ${response.body}',
+        );
+      }
+    } catch (e) {
+      print('오늘의 질문 조회 예외: $e');
+      throw Exception('오늘의 질문 조회 오류: $e');
+    }
+  }
+
+  // 답변 저장
+  static Future<void> submitAnswer({
+    required int questionId,
+    required String content,
+    String? jwt,
+  }) async {
+    try {
+      final url = Uri.parse('$baseUrl/questions/answer');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
+      final body = {'questionId': questionId, 'content': content};
+
+      print('답변 저장 요청:');
+      print('- URL: $url');
+      print('- JWT: ${jwt != null ? "있음" : "없음"}');
+      print('- Body: $body');
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      print('답변 저장 응답 상태: ${response.statusCode}');
+      print('답변 저장 응답 바디: ${response.body}');
+
+      if (response.statusCode != 200) {
+        throw Exception('답변 저장 실패: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('답변 저장 예외: $e');
+      throw Exception('답변 저장 오류: $e');
+    }
+  }
+
+  // 오늘의 메모 조회
+  static Future<Map<String, dynamic>?> fetchTodayMemo({String? jwt}) async {
+    try {
+      final url = Uri.parse('$baseUrl/memos/today/latest');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+
+      // JWT 토큰이 있으면 헤더에 추가
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
+      print('오늘의 메모 조회 요청:');
+      print('- URL: $url');
+      print('- JWT: ${jwt != null ? "있음" : "없음"}');
+      if (jwt != null && jwt.isNotEmpty) {
+        print('- Authorization 헤더: Bearer $jwt');
+      }
+
+      final response = await http.get(url, headers: headers);
+      print('오늘의 메모 조회 응답 상태: ${response.statusCode}');
+      print('오늘의 메모 조회 응답 바디: ${response.body}');
+      print('오늘의 메모 조회 응답 바디 길이: ${response.body.length}');
+      print('오늘의 메모 조회 응답 바디가 비어있나: ${response.body.isEmpty}');
+
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          final data = jsonDecode(response.body);
+          print('오늘의 메모 파싱된 데이터: $data');
+          print('오늘의 메모 데이터 타입: ${data.runtimeType}');
+          if (data is Map<String, dynamic>) {
+            print('오늘의 메모 id 값: ${data['id']}');
+            print('오늘의 메모 title 값: ${data['title']}');
+            print('오늘의 메모 content 값: ${data['content']}');
+            print('오늘의 메모 type 값: ${data['type']}');
+            print('오늘의 메모 createdAt 값: ${data['createdAt']}');
+          }
+          return data;
+        } else {
+          print('오늘의 메모 응답이 비어있음');
+          return null;
+        }
+      } else {
+        print('오늘의 메모 조회 실패: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('오늘의 메모 조회 예외: $e');
+      return null;
+    }
+  }
+
+  // 히스토리(메모&답변) 리스트 조회
+  static Future<List<Map<String, dynamic>>> fetchHistoryList({
+    String type = 'all',
+    String? jwt,
+  }) async {
+    try {
+      final url = Uri.parse('$baseUrl/history?type=$type');
+      final headers = <String, String>{
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      };
+
+      // JWT 토큰이 있으면 헤더에 추가
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
+      print('/history 리스트 조회 요청: type=$type');
+      print('- URL: $url');
+      print('- JWT: ${jwt != null ? "있음" : "없음"}');
+      if (jwt != null && jwt.isNotEmpty) {
+        print('- Authorization 헤더: Bearer $jwt');
+      }
+
+      final response = await http.get(url, headers: headers);
+      print('/history 리스트 응답 상태: ${response.statusCode}');
+      print('/history 리스트 응답 바디: ${response.body}');
+
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final data = jsonDecode(response.body);
+        if (data is List) {
+          return List<Map<String, dynamic>>.from(data);
+        } else {
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('/history 리스트 조회 예외: $e');
+      return [];
     }
   }
 }

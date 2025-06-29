@@ -58,7 +58,9 @@ class _NicknameSelectScreenState extends State<NicknameSelectScreen> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => StartView(nickname: nickname)),
+        MaterialPageRoute(
+          builder: (context) => StartView(nickname: nickname, jwt: widget.jwt),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

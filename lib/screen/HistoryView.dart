@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/HistoryViewSearch.dart';
 import 'package:idea_soop/screen/home_screen.dart';
+import 'package:idea_soop/services/api_service.dart';
 
 class HistoryView extends StatefulWidget {
+  final String? jwt;
+
+  const HistoryView({super.key, this.jwt});
+
   @override
   State<HistoryView> createState() => _HistoryViewState();
 }
@@ -11,45 +16,46 @@ class HistoryView extends StatefulWidget {
 class _HistoryViewState extends State<HistoryView> {
   String selectedSource = '모두';
 
-  // 임시 메모 데이터
-  final List<Map<String, String>> memos = [
-    {
-      'date': '2025.05.20',
-      'type': '오늘의 질문',
-      'source': '질문에 대한 답변',
-      'title': '요즘 나를 가장 괴롭히는 생각은?',
-      'content': '타인의 시선을 너무 신경쓰게 되는 요즘...',
-      'tags': '#자존감 #괴로운생각 #메모',
-    },
-    {
-      'date': '2025.05.20',
-      'type': '음성녹음',
-      'source': '메모',
-      'title': '요즘 나를 가장 괴롭히는 생각은?',
-      'content': '타인의 시선을 너무 신경쓰게 되는 요즘...',
-      'tags': '#자존감 #괴로운생각 #메모',
-    },
-    {
-      'date': '2025.05.20',
-      'type': '음성녹음',
-      'source': '메모',
-      'title': '요즘 나를 가장 괴롭히는 생각은?',
-      'content': '타인의 시선을 너무 신경쓰게 되는 요즘...',
-      'tags': '#자존감 #괴로운생각 #메모',
-    },
-    // ... 추가 메모
-  ];
+  // // 임시 메모 데이터
+  // final List<Map<String, String>> memos = [
+  //   {
+  //     'date': '2025.05.19',
+  //     'type': '오늘의 질문',
+  //     'source': '질문에 대한 답변',
+  //     'title': '요즘 나를 가장 괴롭히는 생각은?',
+  //     'content': '타인의 시선을 너무 신경쓰게 되는 요즘...',
+  //     'tags': '#자존감 #괴로운생각 #메모',
+  //   },
+  //   {
+  //     'date': '2025.05.20',
+  //     'type': '음성녹음',
+  //     'source': '메모',
+  //     'title': '요즘 나를 가장 괴롭히는 생각은?',
+  //     'content': '타인의 시선을 너무 신경쓰게 되는 요즘...',
+  //     'tags': '#자존감 #괴로운생각 #메모',
+  //   },
+  //   {
+  //     'date': '2025.05.21',
+  //     'type': '음성녹음',
+  //     'source': '메모',
+  //     'title': '요즘 나를 가장 괴롭히는 생각은?',
+  //     'content': '타인의 시선을 너무 신경쓰게 되는 요즘...',
+  //     'tags': '#자존감 #괴로운생각 #메모',
+  //   },
+  //   // ... 추가 메모
+  // ];
 
   final List<String> sources = ['모두', '질문에 대한 답변', '메모'];
 
+  final Map<String, String> sourceTypeMap = {
+    '모두': 'all',
+    '질문에 대한 답변': 'answer',
+    '메모': 'memo',
+  };
+
   @override
   Widget build(BuildContext context) {
-    // 필터링된 메모 리스트
-    final filteredMemos =
-        selectedSource == '모두'
-            ? memos
-            : memos.where((m) => m['source'] == selectedSource).toList();
-
+    // 필터링된 메모 리스트를 API에서 받아옴
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -58,80 +64,201 @@ class _HistoryViewState extends State<HistoryView> {
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 상단 중앙 안내문
-            Center(
-              child: Text(
-                '오늘은 메모를 아직 안했네요\n메모를 시작해볼까요?',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.brown[700],
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
+            // 오늘의 메모 조회 및 표시
+            FutureBuilder<Map<String, dynamic>?>(
+              future: ApiService.fetchTodayMemo(jwt: widget.jwt),
+              builder: (context, snapshot) {
+                print('HistoryView - FutureBuilder 상태:');
+                print('- connectionState: ${snapshot.connectionState}');
+                print('- hasData: ${snapshot.hasData}');
+                print('- hasError: ${snapshot.hasError}');
+                if (snapshot.hasError) {
+                  print('- error: ${snapshot.error}');
+                }
+                print('- data: ${snapshot.data}');
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      '오류가 발생했습니다: ${snapshot.error}',
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
+
+                final todayMemo = snapshot.data;
+                print('HistoryView - todayMemo: $todayMemo');
+                print('HistoryView - todayMemo is null: ${todayMemo == null}');
+                if (todayMemo != null) {
+                  print('HistoryView - todayMemo id: ${todayMemo['id']}');
+                  print('HistoryView - todayMemo title: ${todayMemo['title']}');
+                  print(
+                    'HistoryView - todayMemo content: ${todayMemo['content']}',
+                  );
+                }
+
+                if (todayMemo == null || todayMemo['id'] == null) {
+                  // 기존 안내문
+                  return Center(
+                    child: Text(
+                      '오늘은 메모를 아직 안했네요\n메모를 시작해볼까요?',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.brown[700],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                } else {
+                  // 오늘의 메모가 있을 때 MemoCard로 표시
+                  print('HistoryView - MemoCard 표시');
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Container(
+                      width: double.infinity,
+                      child: MemoCard(
+                        memo: {
+                          'date': todayMemo['createdAt']
+                              ?.substring(0, 10)
+                              ?.replaceAll('-', '.'),
+                          'type': todayMemo['type'] ?? '메모',
+                          'source': '메모',
+                          'title': todayMemo['title'] ?? '',
+                          'content': todayMemo['content'] ?? '',
+                          'tags':
+                              (todayMemo['tags'] as List?)
+                                  ?.map((e) => '#$e')
+                                  .join(' ') ??
+                              '',
+                        },
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
             SizedBox(height: 24),
             // 드롭다운 + 검색
-            Row(
-              children: [
-                DropdownButton<String>(
-                  value: selectedSource,
-                  items:
-                      sources
-                          .map(
-                            (source) => DropdownMenuItem(
-                              value: source,
-                              child: Text(source),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedSource = value!;
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HistoryViewSearch(),
-                      ),
-                    );
-                  },
-                  icon: Icon(Icons.search),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                children: [
+                  DropdownButton<String>(
+                    value: selectedSource,
+                    items:
+                        sources
+                            .map(
+                              (source) => DropdownMenuItem(
+                                value: source,
+                                child: Text(source),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSource = value!;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => HistoryViewSearch(jwt: widget.jwt),
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.search),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
-            // 메모 리스트
+            // 메모 리스트 (API 기반)
             Expanded(
-              child:
-                  filteredMemos.isEmpty
-                      ? Center(child: Text('메모가 없습니다.'))
-                      : ListView.builder(
-                        itemCount: filteredMemos.length,
-                        itemBuilder: (context, idx) {
-                          final memo = filteredMemos[idx];
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MemoDetailView(memo: memo),
-                                ),
-                              );
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: ApiService.fetchHistoryList(
+                  type: sourceTypeMap[selectedSource] ?? 'all',
+                  jwt: widget.jwt,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  final memos = snapshot.data ?? [];
+                  if (memos.isEmpty) {
+                    return Center(child: Text('메모가 없습니다.'));
+                  }
+                  return ListView.builder(
+                    itemCount: memos.length,
+                    itemBuilder: (context, idx) {
+                      final memo = memos[idx];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => MemoDetailView(
+                                      memo: {
+                                        'date': memo['createdAt']
+                                            ?.substring(0, 10)
+                                            ?.replaceAll('-', '.'),
+                                        'type': memo['type'] ?? '',
+                                        'source':
+                                            memo['type'] == 'answer'
+                                                ? '질문에 대한 답변'
+                                                : '메모',
+                                        'title': memo['title'] ?? '',
+                                        'content': memo['content'] ?? '',
+                                        'tags':
+                                            (memo['tags'] as List?)
+                                                ?.map((e) => '#$e')
+                                                .join(' ') ??
+                                            '',
+                                      },
+                                    ),
+                              ),
+                            );
+                          },
+                          child: MemoCard(
+                            memo: {
+                              'date': memo['createdAt']
+                                  ?.substring(0, 10)
+                                  ?.replaceAll('-', '.'),
+                              'type': memo['type'] ?? '',
+                              'source':
+                                  memo['type'] == 'answer' ? '질문에 대한 답변' : '메모',
+                              'title': memo['title'] ?? '',
+                              'content': memo['content'] ?? '',
+                              'tags':
+                                  (memo['tags'] as List?)
+                                      ?.map((e) => '#$e')
+                                      .join(' ') ??
+                                  '',
                             },
-                            child: MemoCard(memo: memo),
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
