@@ -138,7 +138,7 @@ class MyPageLogCard extends StatelessWidget {
         margin: EdgeInsets.all(20),
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: backgroundColorStrong,
+          color: pointColorWeak.withOpacity(0.4),
           borderRadius: BorderRadius.circular(32),
         ),
 
@@ -179,7 +179,7 @@ class MyPageLogCard extends StatelessWidget {
                   child: _LogInfo(
                     title: "답변/메모",
                     subtitle: "5/15",
-                    imgAsset: 'assets/images/edit_note.png',
+                    imgAsset: 'assets/images/note_alt.png',
                   ),
                 ),
               ],
@@ -338,24 +338,26 @@ class MyPageSettingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      padding: const EdgeInsets.symmetric(horizontal: 0),
       child: Container(
-        decoration: BoxDecoration(
-          color: backgroundColorStrong,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-        ),
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(color: backgroundColor),
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(
             children: [
-              _SettingRow(icon: Icons.dashboard, label: '내 카테고리', onTap: () {}),
               _SettingRow(
-                icon: Icons.notifications_none,
+                asset: 'assets/images/category.png',
+                label: '내 카테고리',
+                onTap: () {},
+              ),
+              _SettingRow(
+                asset: 'assets/images/notification.png',
                 label: '알림 설정',
                 onTap: () {},
               ),
               _SettingRow(
-                icon: Icons.help_outline,
+                asset: 'assets/images/message-question.png',
                 label: '도움말 / 지원',
                 onTap: () {},
               ),
@@ -368,12 +370,12 @@ class MyPageSettingCard extends StatelessWidget {
 }
 
 class _SettingRow extends StatelessWidget {
-  final IconData icon;
+  final String asset;
   final String label;
   final VoidCallback onTap;
 
   const _SettingRow({
-    required this.icon,
+    required this.asset,
     required this.label,
     required this.onTap,
   });
@@ -386,7 +388,7 @@ class _SettingRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
         child: Row(
           children: [
-            Icon(icon, color: Colors.black87),
+            Image.asset(asset, width: 25, height: 25, fit: BoxFit.fill),
             SizedBox(width: 20),
             Expanded(child: Text(label, style: TextStyle(fontSize: 16))),
             Icon(Icons.chevron_right, color: Colors.black54),

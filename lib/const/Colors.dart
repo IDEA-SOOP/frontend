@@ -11,6 +11,6 @@ const Color textColorFirst = Color(0xFF000000);
 const Color textColorSecond = Color(0x80000000);
 const Color textColorThird = Color(0xFF7F7F7F);
 
-const Color backgroundColorStrong = Color(0xFFF2E7D1);
-const Color pointColorStrong = Color(0xFF369882);
-const Color pointColorWeak = Color(0xFF49AD94);
+const Color backgroundColorStrong = Color(0xFFF0EBCE);
+const Color pointColorStrong = Color(0xFF5F6F52);
+const Color pointColorWeak = Color(0xFFA9B388);

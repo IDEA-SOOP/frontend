@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
+import 'package:idea_soop/screen/CharacterScreen.dart';
 import 'package:idea_soop/screen/HistoryView.dart';
 import 'package:idea_soop/screen/MyPageScreen.dart';
 import 'package:intl/intl.dart';
@@ -238,6 +239,34 @@ class HomeBottomNav extends StatelessWidget {
       height: 90,
       child: BottomNavigationBar(
         currentIndex: currentIndex,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+              break;
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HistoryView()),
+              );
+              break;
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CharacterScreen()),
+              );
+              break;
+            case 3:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyPageScreen()),
+              );
+              break;
+          }
+        },
         items: [
           BottomNavigationBarItem(
             icon: IconButton(
@@ -323,6 +352,7 @@ class HomeBottomNav extends StatelessWidget {
     );
   }
 }
+
 
 class HomeQuestionCard extends StatelessWidget {
   final bool isAnswering;

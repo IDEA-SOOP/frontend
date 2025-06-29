@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idea_soop/const/Colors.dart';
+import 'package:idea_soop/screen/home_screen.dart';
 import 'package:idea_soop/screen/onboarding/CharacterSelectScreen.dart';
 import 'package:idea_soop/screen/onboarding/KakaoLoginButton.dart';
 
@@ -45,6 +46,15 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: 56),
               // 카카오 로그인 버튼 placeholder
               const KakaoLoginbutton(),
+              SizedBox(height: 10),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );}, 
+                child: Text("개발용 메인페이지 이동 버튼")
+                )
             ],
           ),
         ),
