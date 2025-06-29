@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl =
-      'https://7b3c-222-233-108-66.ngrok-free.app'; // HTTPS로 변경
+      'https://870f-211-59-211-217.ngrok-free.app'; // HTTPS로 변경
 
   // 카카오 로그인 API
   static Future<Map<String, dynamic>> kakaoLogin(String accessToken) async {

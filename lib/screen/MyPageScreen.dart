@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/home_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -11,34 +14,54 @@ class MyPageScreen extends StatefulWidget {
 
 class _MyPageScreenState extends State<MyPageScreen> {
   int _selectedIndex = 3;
+  late Future<UserProfile> futureProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    futureProfile = fetchUserProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight:
-                  MediaQuery.of(context).size.height -
-                  90, // 90: bottom nevigation bar's height
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                children: [
-                  MyPageAppBar(),
-                  Divider(color: Colors.grey.withOpacity(0.2)),
-                  MyPageUserInfo(),
-                  MyPageLogCard(),
-                  Spacer(),
-                  MyPageSettingCard(),
-                ],
-              ),
-            ),
-          ),
+        child: FutureBuilder<UserProfile>(
+          future: futureProfile,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("에러 발생: ${snapshot.error}"));
+            } else if (snapshot.hasData) {
+              final profile = snapshot.data!;
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height - 90,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        MyPageAppBar(),
+                        Divider(color: Colors.grey.withOpacity(0.2)),
+                        MyPageUserInfo(profile: profile), // ✅ 전달!
+                        MyPageLogCard(profile: profile),
+                        Spacer(),
+                        MyPageSettingCard(),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return Center(child: Text("데이터 없음"));
+            }
+          },
         ),
       ),
+
       bottomNavigationBar: HomeBottomNav(currentIndex: _selectedIndex),
     );
   }
@@ -74,10 +97,15 @@ class MyPageAppBar extends StatelessWidget {
 }
 
 class MyPageUserInfo extends StatelessWidget {
-  @override
-  String? profileImageUrl; // 예: null 또는 'https://example.com/my.jpg'
+  final UserProfile profile;
+
+  const MyPageUserInfo({super.key, required this.profile});
+  // @override
+  // String? profileImageUrl; // 예: null 또는 'https://example.com/my.jpg'
 
   Widget build(BuildContext context) {
+    final profileImageUrl = profile.seedStageImageUrl;
+
     return Container(
       child: Padding(
         padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
@@ -101,8 +129,8 @@ class MyPageUserInfo extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "000님",
+                    Text(
+                      "${profile.nickname}님",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -111,8 +139,8 @@ class MyPageUserInfo extends StatelessWidget {
                     SizedBox(height: 7),
                     GestureDetector(
                       onTap: () {},
-                      child: const Text(
-                        "함께한지 nn일째",
+                      child: Text(
+                        "함께한지 ${profile.daysSinceJoin}일째",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
@@ -128,6 +156,9 @@ class MyPageUserInfo extends StatelessWidget {
 }
 
 class MyPageLogCard extends StatelessWidget {
+  final UserProfile profile;
+
+  const MyPageLogCard({super.key, required this.profile});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -141,15 +172,15 @@ class MyPageLogCard extends StatelessWidget {
 
         child: Column(
           children: [
-            MyPageTreeStateCard(),
+            MyPageTreeStateCard(profile: profile),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
                   child: _LogInfo(
                     title: "씨앗 단계",
-                    subtitle: "1/4 단계",
-                    imgAsset: 'assets/images/seed0.png',
+                    subtitle: "${profile.seedStage}/4 단계",
+                    imgAsset: 'assets${profile.seedStageImageUrl}',
                   ),
                 ),
                 SizedBox(width: 8),
@@ -175,7 +206,7 @@ class MyPageLogCard extends StatelessWidget {
                 Expanded(
                   child: _LogInfo(
                     title: "답변/메모",
-                    subtitle: "5/15",
+                    subtitle: "${profile.answerCount}/${profile.memoCount}",
                     imgAsset: 'assets/images/note_alt.png',
                   ),
                 ),
@@ -306,6 +337,10 @@ class _LogInfo extends StatelessWidget {
 }
 
 class MyPageTreeStateCard extends StatelessWidget {
+  final UserProfile profile;
+
+  const MyPageTreeStateCard({super.key, required this.profile});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -315,13 +350,13 @@ class MyPageTreeStateCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/seed0.png',
+              'assets${profile.seedStageImageUrl}',
               height: 60,
               fit: BoxFit.fitHeight,
             ),
             SizedBox(height: 15),
             Text(
-              "오늘, 생각 한 알을 심었어요",
+              "${profile.seedDescription}",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
@@ -393,5 +428,67 @@ class _SettingRow extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class UserProfile {
+  final String nickname;
+  final int daysSinceJoin;
+  final int seedStage;
+  final String seedStageImageUrl;
+  final String seedDescription;
+  final int answerCount;
+  final int memoCount;
+  final int level;
+
+  UserProfile({
+    required this.nickname,
+    required this.daysSinceJoin,
+    required this.seedStage,
+    required this.seedStageImageUrl,
+    required this.seedDescription,
+    required this.answerCount,
+    required this.memoCount,
+    required this.level,
+  });
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      nickname: json['nickname'],
+      daysSinceJoin: json['daysSinceJoin'],
+      seedStage: json['seedStage'],
+      seedStageImageUrl: json['seedStageImageUrl'],
+      seedDescription: json['seedDescription'],
+      answerCount: json['answerCount'],
+      memoCount: json['memoCount'],
+      level: json['level'],
+    );
+  }
+}
+
+Future<String?> loadToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('accessToken');
+}
+
+Future<UserProfile> fetchUserProfile() async {
+  final prefs = await SharedPreferences.getInstance();
+  final jwtt = prefs.getString('accessToken');
+
+  final url = Uri.parse('https://870f-211-59-211-217.ngrok-free.app/mypage');
+  final response = await http.get(
+    url,
+    headers: {'Authorization': 'Bearer $jwtt'},
+  );
+
+  print("내 토큰2: $jwtt");
+  print('응답 상태 코드: ${response.statusCode}');
+  print('응답 본문: ${response.body}');
+
+  if (response.statusCode == 200) {
+    final jsonData = jsonDecode(response.body);
+    return UserProfile.fromJson(jsonData);
+  } else {
+    throw Exception('유저 정보를 불러오지 못했습니다.');
   }
 }

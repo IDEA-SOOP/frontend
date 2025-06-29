@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isAnswering = false;
   final TextEditingController _answerController = TextEditingController();
   String? _savedAnswer;
-
   @override
   void dispose() {
     _answerController.dispose();
@@ -157,7 +156,6 @@ class HomeBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 90,
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
