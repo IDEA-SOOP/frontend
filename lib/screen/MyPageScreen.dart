@@ -7,8 +7,11 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyPageScreen extends StatefulWidget {
-  const MyPageScreen({super.key});
+  final String? jwt;
 
+  const MyPageScreen({super.key, this.jwt});
+
+  @override
   State<MyPageScreen> createState() => _MyPageScreenState();
 }
 

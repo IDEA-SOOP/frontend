@@ -4,7 +4,9 @@ import 'package:idea_soop/screen/home_screen.dart';
 
 class StartView extends StatelessWidget {
   final String nickname;
-  const StartView({super.key, required this.nickname});
+  final String? jwt;
+
+  const StartView({super.key, required this.nickname, this.jwt});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,9 @@ class StartView extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => HomeScreen(),
+                        builder:
+                            (context) =>
+                                HomeScreen(nickname: nickname, jwt: jwt),
                       ),
                     );
                   },
