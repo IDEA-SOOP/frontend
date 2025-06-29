@@ -64,7 +64,7 @@ class _HistoryViewState extends State<HistoryView> {
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -122,60 +122,69 @@ class _HistoryViewState extends State<HistoryView> {
                 } else {
                   // 오늘의 메모가 있을 때 MemoCard로 표시
                   print('HistoryView - MemoCard 표시');
-                  return MemoCard(
-                    memo: {
-                      'date': todayMemo['createdAt']
-                          ?.substring(0, 10)
-                          ?.replaceAll('-', '.'),
-                      'type': todayMemo['type'] ?? '메모',
-                      'source': '메모',
-                      'title': todayMemo['title'] ?? '',
-                      'content': todayMemo['content'] ?? '',
-                      'tags':
-                          (todayMemo['tags'] as List?)
-                              ?.map((e) => '#$e')
-                              .join(' ') ??
-                          '',
-                    },
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Container(
+                      width: double.infinity,
+                      child: MemoCard(
+                        memo: {
+                          'date': todayMemo['createdAt']
+                              ?.substring(0, 10)
+                              ?.replaceAll('-', '.'),
+                          'type': todayMemo['type'] ?? '메모',
+                          'source': '메모',
+                          'title': todayMemo['title'] ?? '',
+                          'content': todayMemo['content'] ?? '',
+                          'tags':
+                              (todayMemo['tags'] as List?)
+                                  ?.map((e) => '#$e')
+                                  .join(' ') ??
+                              '',
+                        },
+                      ),
+                    ),
                   );
                 }
               },
             ),
             SizedBox(height: 24),
             // 드롭다운 + 검색
-            Row(
-              children: [
-                DropdownButton<String>(
-                  value: selectedSource,
-                  items:
-                      sources
-                          .map(
-                            (source) => DropdownMenuItem(
-                              value: source,
-                              child: Text(source),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedSource = value!;
-                    });
-                  },
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => HistoryViewSearch(jwt: widget.jwt),
-                      ),
-                    );
-                  },
-                  icon: Icon(Icons.search),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                children: [
+                  DropdownButton<String>(
+                    value: selectedSource,
+                    items:
+                        sources
+                            .map(
+                              (source) => DropdownMenuItem(
+                                value: source,
+                                child: Text(source),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedSource = value!;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => HistoryViewSearch(jwt: widget.jwt),
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.search),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             // 메모 리스트 (API 기반)
@@ -197,50 +206,53 @@ class _HistoryViewState extends State<HistoryView> {
                     itemCount: memos.length,
                     itemBuilder: (context, idx) {
                       final memo = memos[idx];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => MemoDetailView(
-                                    memo: {
-                                      'date': memo['createdAt']
-                                          ?.substring(0, 10)
-                                          ?.replaceAll('-', '.'),
-                                      'type': memo['type'] ?? '',
-                                      'source':
-                                          memo['type'] == 'answer'
-                                              ? '질문에 대한 답변'
-                                              : '메모',
-                                      'title': memo['title'] ?? '',
-                                      'content': memo['content'] ?? '',
-                                      'tags':
-                                          (memo['tags'] as List?)
-                                              ?.map((e) => '#$e')
-                                              .join(' ') ??
-                                          '',
-                                    },
-                                  ),
-                            ),
-                          );
-                        },
-                        child: MemoCard(
-                          memo: {
-                            'date': memo['createdAt']
-                                ?.substring(0, 10)
-                                ?.replaceAll('-', '.'),
-                            'type': memo['type'] ?? '',
-                            'source':
-                                memo['type'] == 'answer' ? '질문에 대한 답변' : '메모',
-                            'title': memo['title'] ?? '',
-                            'content': memo['content'] ?? '',
-                            'tags':
-                                (memo['tags'] as List?)
-                                    ?.map((e) => '#$e')
-                                    .join(' ') ??
-                                '',
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => MemoDetailView(
+                                      memo: {
+                                        'date': memo['createdAt']
+                                            ?.substring(0, 10)
+                                            ?.replaceAll('-', '.'),
+                                        'type': memo['type'] ?? '',
+                                        'source':
+                                            memo['type'] == 'answer'
+                                                ? '질문에 대한 답변'
+                                                : '메모',
+                                        'title': memo['title'] ?? '',
+                                        'content': memo['content'] ?? '',
+                                        'tags':
+                                            (memo['tags'] as List?)
+                                                ?.map((e) => '#$e')
+                                                .join(' ') ??
+                                            '',
+                                      },
+                                    ),
+                              ),
+                            );
                           },
+                          child: MemoCard(
+                            memo: {
+                              'date': memo['createdAt']
+                                  ?.substring(0, 10)
+                                  ?.replaceAll('-', '.'),
+                              'type': memo['type'] ?? '',
+                              'source':
+                                  memo['type'] == 'answer' ? '질문에 대한 답변' : '메모',
+                              'title': memo['title'] ?? '',
+                              'content': memo['content'] ?? '',
+                              'tags':
+                                  (memo['tags'] as List?)
+                                      ?.map((e) => '#$e')
+                                      .join(' ') ??
+                                  '',
+                            },
+                          ),
                         ),
                       );
                     },
