@@ -235,10 +235,28 @@ class ApiService {
       final response = await http.get(url, headers: headers);
       print('오늘의 메모 조회 응답 상태: ${response.statusCode}');
       print('오늘의 메모 조회 응답 바디: ${response.body}');
+      print('오늘의 메모 조회 응답 바디 길이: ${response.body.length}');
+      print('오늘의 메모 조회 응답 바디가 비어있나: ${response.body.isEmpty}');
 
-      if (response.statusCode == 200 && response.body.isNotEmpty) {
-        return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          final data = jsonDecode(response.body);
+          print('오늘의 메모 파싱된 데이터: $data');
+          print('오늘의 메모 데이터 타입: ${data.runtimeType}');
+          if (data is Map<String, dynamic>) {
+            print('오늘의 메모 id 값: ${data['id']}');
+            print('오늘의 메모 title 값: ${data['title']}');
+            print('오늘의 메모 content 값: ${data['content']}');
+            print('오늘의 메모 type 값: ${data['type']}');
+            print('오늘의 메모 createdAt 값: ${data['createdAt']}');
+          }
+          return data;
+        } else {
+          print('오늘의 메모 응답이 비어있음');
+          return null;
+        }
       } else {
+        print('오늘의 메모 조회 실패: ${response.statusCode}');
         return null;
       }
     } catch (e) {

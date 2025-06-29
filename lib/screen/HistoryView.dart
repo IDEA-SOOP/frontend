@@ -72,10 +72,40 @@ class _HistoryViewState extends State<HistoryView> {
             FutureBuilder<Map<String, dynamic>?>(
               future: ApiService.fetchTodayMemo(jwt: widget.jwt),
               builder: (context, snapshot) {
+                print('HistoryView - FutureBuilder 상태:');
+                print('- connectionState: ${snapshot.connectionState}');
+                print('- hasData: ${snapshot.hasData}');
+                print('- hasError: ${snapshot.hasError}');
+                if (snapshot.hasError) {
+                  print('- error: ${snapshot.error}');
+                }
+                print('- data: ${snapshot.data}');
+
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      '오류가 발생했습니다: ${snapshot.error}',
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                }
+
                 final todayMemo = snapshot.data;
+                print('HistoryView - todayMemo: $todayMemo');
+                print('HistoryView - todayMemo is null: ${todayMemo == null}');
+                if (todayMemo != null) {
+                  print('HistoryView - todayMemo id: ${todayMemo['id']}');
+                  print('HistoryView - todayMemo title: ${todayMemo['title']}');
+                  print(
+                    'HistoryView - todayMemo content: ${todayMemo['content']}',
+                  );
+                }
+
                 if (todayMemo == null || todayMemo['id'] == null) {
                   // 기존 안내문
                   return Center(
@@ -91,6 +121,7 @@ class _HistoryViewState extends State<HistoryView> {
                   );
                 } else {
                   // 오늘의 메모가 있을 때 MemoCard로 표시
+                  print('HistoryView - MemoCard 표시');
                   return MemoCard(
                     memo: {
                       'date': todayMemo['createdAt']
