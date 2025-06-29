@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _savedAnswer;
 
   late Future<UserProfile> futureProfile;
-  
+
   // 질문 관련 상태
   int? _questionId;
   String? _questionContent;
@@ -59,10 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    
-    futureProfile = fetchUserProfile();
-  }
 
+    futureProfile = fetchUserProfile();
     _fetchTodayQuestion();
     print('HomeScreen에서 받은 JWT: ${widget.jwt}');
   }
@@ -117,16 +115,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  int _selectedIndex = 0;
-
   @override
   void dispose() {
     _answerController.dispose();
     super.dispose();
   }
-
-
-  final int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -161,33 +154,33 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       SingleChildScrollView(
-                  child: HomeQuestionCard(
-                    isAnswering: _isAnswering,
-                    savedAnswer: _savedAnswer,
-                    answerController: _answerController,
-                    onCancel: () {
-                      setState(() {
-                        _isAnswering = false;
-                        _answerController.clear();
-                      });
-                    },
-                    onSave: _submitAnswer,
-                    onStartAnswer: () {
-                      setState(() {
-                        _isAnswering = true;
-                        _answerController.clear();
-                      });
-                    },
-                    onEditAnswer: () {
-                      setState(() {
-                        _isAnswering = true;
-                        _answerController.text = _savedAnswer ?? '';
-                      });
-                    },
-                    questionContent: _questionContent,
-                    isLoadingQuestion: _isLoadingQuestion,
-                  ),
-                ),
+                        child: HomeQuestionCard(
+                          isAnswering: _isAnswering,
+                          savedAnswer: _savedAnswer,
+                          answerController: _answerController,
+                          onCancel: () {
+                            setState(() {
+                              _isAnswering = false;
+                              _answerController.clear();
+                            });
+                          },
+                          onSave: _submitAnswer,
+                          onStartAnswer: () {
+                            setState(() {
+                              _isAnswering = true;
+                              _answerController.clear();
+                            });
+                          },
+                          onEditAnswer: () {
+                            setState(() {
+                              _isAnswering = true;
+                              _answerController.text = _savedAnswer ?? '';
+                            });
+                          },
+                          questionContent: _questionContent,
+                          isLoadingQuestion: _isLoadingQuestion,
+                        ),
+                      ),
                       Positioned(
                         child: Align(
                           alignment: Alignment.bottomCenter,
@@ -205,16 +198,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             bottomNavigationBar: HomeBottomNav(
-        currentIndex: _selectedIndex,
-        nickname: widget.nickname,
-        jwt: widget.jwt,
-      ),
+              currentIndex: 0,
+              nickname: widget.nickname,
+              jwt: widget.jwt,
+            ),
           );
         } else {
           return const Center(child: Text("데이터 없음"));
         }
       },
-
     );
   }
 }
@@ -228,7 +220,6 @@ class HomeAppBar extends StatelessWidget {
     required this.formattedDate,
     required this.profile, // 변경됨
   });
-
 
   @override
   Widget build(BuildContext context) {
@@ -273,8 +264,15 @@ class HomeAppBar extends StatelessWidget {
 
 class HomeBottomNav extends StatelessWidget {
   final int currentIndex;
+  final String? nickname;
+  final String? jwt;
 
-  const HomeBottomNav({super.key, required this.currentIndex});
+  const HomeBottomNav({
+    super.key,
+    required this.currentIndex,
+    this.nickname,
+    this.jwt,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +284,10 @@ class HomeBottomNav extends StatelessWidget {
             case 0:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HomeScreen(nickname: nickname,jwt: jwt)),
+                MaterialPageRoute(
+                  builder:
+                      (context) => HomeScreen(nickname: nickname, jwt: jwt),
+                ),
               );
               break;
             case 1:
@@ -298,7 +299,9 @@ class HomeBottomNav extends StatelessWidget {
             case 2:
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CharacterScreen(jwt: jwt)),
+                MaterialPageRoute(
+                  builder: (context) => CharacterScreen(jwt: jwt),
+                ),
               );
               break;
             case 3:
@@ -582,13 +585,17 @@ class UserProfile {
   final String mainAnimalImageUrl;
   final String backgroundImageUrl;
 
-  UserProfile({required this.nickname, required this.mainAnimalImageUrl, required this.backgroundImageUrl});
+  UserProfile({
+    required this.nickname,
+    required this.mainAnimalImageUrl,
+    required this.backgroundImageUrl,
+  });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       nickname: json['nickname'],
       mainAnimalImageUrl: json['mainAnimalImageUrl'],
-      backgroundImageUrl: json['backgroundImageUrl']
+      backgroundImageUrl: json['backgroundImageUrl'],
     );
   }
 }

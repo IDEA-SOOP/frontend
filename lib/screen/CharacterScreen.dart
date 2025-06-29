@@ -3,6 +3,10 @@ import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/home_screen.dart';
 
 class CharacterScreen extends StatefulWidget {
+  final String? jwt;
+
+  const CharacterScreen({super.key, this.jwt});
+
   @override
   _CharacterScreenState createState() => _CharacterScreenState();
 }
@@ -107,7 +111,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: HomeBottomNav(currentIndex: 2),
+      bottomNavigationBar: HomeBottomNav(currentIndex: 2, jwt: widget.jwt),
     );
   }
 }
