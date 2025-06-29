@@ -212,18 +212,30 @@ class ApiService {
   }
 
   // 오늘의 메모 조회
-  static Future<Map<String, dynamic>?> fetchTodayMemo() async {
+  static Future<Map<String, dynamic>?> fetchTodayMemo({String? jwt}) async {
     try {
       final url = Uri.parse('$baseUrl/memos/today/latest');
       final headers = <String, String>{
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
       };
+
+      // JWT 토큰이 있으면 헤더에 추가
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
       print('오늘의 메모 조회 요청:');
       print('- URL: $url');
+      print('- JWT: ${jwt != null ? "있음" : "없음"}');
+      if (jwt != null && jwt.isNotEmpty) {
+        print('- Authorization 헤더: Bearer $jwt');
+      }
+
       final response = await http.get(url, headers: headers);
-      print('오늘의 메모 조회 응답 상태: [32m${response.statusCode}[0m');
+      print('오늘의 메모 조회 응답 상태: ${response.statusCode}');
       print('오늘의 메모 조회 응답 바디: ${response.body}');
+
       if (response.statusCode == 200 && response.body.isNotEmpty) {
         return jsonDecode(response.body);
       } else {
@@ -238,6 +250,7 @@ class ApiService {
   // 히스토리(메모&답변) 리스트 조회
   static Future<List<Map<String, dynamic>>> fetchHistoryList({
     String type = 'all',
+    String? jwt,
   }) async {
     try {
       final url = Uri.parse('$baseUrl/history?type=$type');
@@ -245,11 +258,23 @@ class ApiService {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
       };
+
+      // JWT 토큰이 있으면 헤더에 추가
+      if (jwt != null) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
+
       print('/history 리스트 조회 요청: type=$type');
       print('- URL: $url');
+      print('- JWT: ${jwt != null ? "있음" : "없음"}');
+      if (jwt != null && jwt.isNotEmpty) {
+        print('- Authorization 헤더: Bearer $jwt');
+      }
+
       final response = await http.get(url, headers: headers);
       print('/history 리스트 응답 상태: ${response.statusCode}');
       print('/history 리스트 응답 바디: ${response.body}');
+
       if (response.statusCode == 200 && response.body.isNotEmpty) {
         final data = jsonDecode(response.body);
         if (data is List) {

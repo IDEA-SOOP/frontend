@@ -5,6 +5,10 @@ import 'package:idea_soop/screen/home_screen.dart';
 import 'package:idea_soop/services/api_service.dart';
 
 class HistoryView extends StatefulWidget {
+  final String? jwt;
+
+  const HistoryView({super.key, this.jwt});
+
   @override
   State<HistoryView> createState() => _HistoryViewState();
 }
@@ -66,7 +70,7 @@ class _HistoryViewState extends State<HistoryView> {
           children: [
             // 오늘의 메모 조회 및 표시
             FutureBuilder<Map<String, dynamic>?>(
-              future: ApiService.fetchTodayMemo(),
+              future: ApiService.fetchTodayMemo(jwt: widget.jwt),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -133,7 +137,8 @@ class _HistoryViewState extends State<HistoryView> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HistoryViewSearch(),
+                        builder:
+                            (context) => HistoryViewSearch(jwt: widget.jwt),
                       ),
                     );
                   },
@@ -147,6 +152,7 @@ class _HistoryViewState extends State<HistoryView> {
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: ApiService.fetchHistoryList(
                   type: sourceTypeMap[selectedSource] ?? 'all',
+                  jwt: widget.jwt,
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

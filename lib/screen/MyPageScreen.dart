@@ -4,8 +4,11 @@ import 'package:idea_soop/const/Colors.dart';
 import 'package:idea_soop/screen/home_screen.dart';
 
 class MyPageScreen extends StatefulWidget {
-  const MyPageScreen({super.key});
+  final String? jwt;
 
+  const MyPageScreen({super.key, this.jwt});
+
+  @override
   State<MyPageScreen> createState() => _MyPageScreenState();
 }
 
@@ -221,29 +224,17 @@ class MyPageLogCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Image.asset(
-                        'assets/images/seed0.png',
-                        width: 40,
-                      ),
-                      Image.asset(
-                        'assets/images/seed1.png',
-                        width: 50,
-                      ),
-                      Image.asset(
-                        'assets/images/seed2.png',
-                        width: 60,
-                      ),
-                      Image.asset(
-                        'assets/images/seed3.png',
-                        width: 60,
-                      ),
+                      Image.asset('assets/images/seed0.png', width: 40),
+                      Image.asset('assets/images/seed1.png', width: 50),
+                      Image.asset('assets/images/seed2.png', width: 60),
+                      Image.asset('assets/images/seed3.png', width: 60),
                     ],
                   ),
                 ),
                 SizedBox(height: 20),
                 Text(
                   '작은 생각 하나가 씨앗이 돼요.\n씨앗을 키워서 나무 한 그루를 완성해보세요!',
-                  style: TextStyle(fontSize: 14, ),
+                  style: TextStyle(fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 20),

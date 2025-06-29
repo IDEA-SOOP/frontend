@@ -263,7 +263,9 @@ class HomeBottomNav extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HistoryView()),
+                  MaterialPageRoute(
+                    builder: (context) => HistoryView(jwt: jwt),
+                  ),
                 );
               },
               icon: Image.asset(
@@ -279,7 +281,9 @@ class HomeBottomNav extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HistoryView()),
+                  MaterialPageRoute(
+                    builder: (context) => HistoryView(jwt: jwt),
+                  ),
                 );
               },
               icon: Image.asset(
@@ -295,7 +299,9 @@ class HomeBottomNav extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyPageScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => MyPageScreen(jwt: jwt),
+                  ),
                 );
               },
               icon: Image.asset(
